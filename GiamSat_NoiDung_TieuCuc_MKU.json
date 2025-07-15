@@ -1,0 +1,649 @@
+{
+  "name": "MKU_15_7",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        20,
+        640
+      ],
+      "id": "2ed07766-007b-4c71-8667-39111c6fa1be",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yUfnPS2l6t7sUftv",
+          "name": "API Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Tập lịch chạy",
+      "id": "aed8da12-efd0-4287-a074-636a2bbbc9a5"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        0
+      ],
+      "id": "418e70f3-a154-44a8-abdb-f5981cb8690e",
+      "name": "Gửi request tìm bài viết"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 👉 Tạo một mảng trống để lưu toàn bộ kết quả từ nhiều nguồn khác nhau\nconst allItems = [];\n\nfor (const input of items) {\n  // 👉 Lấy danh sách kết quả tìm kiếm từ Custom Search API (nếu có)\n  const results = input.json.items || [];\n  \n\n  // 👉 Duyệt qua từng kết quả trong `items`\n  for (const item of results) {\n    // 👉 Đẩy mỗi kết quả vào mảng `allItems` dưới dạng một object chuẩn\n    allItems.push({\n      json: {\n        title: item.title || '',       \n        link: item.link || '',         \n        snippet: item.snippet || '',               \n      }\n    });\n  }\n}\n\n// 👉 Trả về toàn bộ kết quả đã hợp nhất từ nhiều nguồn\nreturn allItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        0
+      ],
+      "id": "539d07da-7b0e-45c0-a458-d2fda74e8b29",
+      "name": "Tách danh sách bài viết",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// ✅ Danh sách từ khóa liên quan đến Trường Đại học Cửu Long\nconst TRUONG_KEYWORDS = [\n  \"đại học cửu long\", \"đh cửu long\", \"mku\", \"trường cửu long\",\n  \"trường đại học cửu long\", \"cửu long university\", \"truong dai hoc cuu long\"\n];\n\n// ✅ Danh sách từ khóa mang tính TIÊU CỰC\nconst TIEU_CUC_KEYWORDS = [\n  \"lừa đảo\", \"gian lận\", \"phốt\", \"scam\", \"chiếm đoạt\", \"dối trá\",\n  \"bóc phốt\", \"mập mờ\", \"thiếu minh bạch\", \"giả mạo\", \"mất uy tín\",\n  \"hạ chuẩn\", \"tẩy chay\", \"bị tố\", \"bê bối\", \"đình chỉ\", \"chất lượng kém\",\n  \"phản ánh tiêu cực\", \"tranh cãi\", \"gian dối\", \"bất công\", \"hứa suông\",\n  \"làm tiền\", \"đa cấp\", \"có dấu hiệu sai phạm\"\n];\n\n// ✅ Lấy thời gian hiện tại (giờ Việt Nam, định dạng đầy đủ)\nconst ngayPhatHien = new Date().toLocaleString(\"vi-VN\", {\n  timeZone: \"Asia/Ho_Chi_Minh\",\n  hour12: false\n}).replace(\",\", \"\"); // Xóa dấu phẩy giữa ngày và giờ\n\n// ✅ Mảng kết quả cuối cùng sẽ được trả về\nconst ketQua = [];\n\n// ✅ Hàm kiểm tra xem chuỗi có chứa bất kỳ từ khóa nào không\nfunction containsAny(text, keywords) {\n  return keywords.some(k => text.includes(k));\n}\n\n// ✅ Duyệt qua tất cả các bài viết từ node trước\nfor (const item of items) {\n  // Lấy tiêu đề và mô tả, chuyển về chữ thường để so sánh\n  const title = (item.json.title || \"\").toLowerCase();\n  const snippet = (item.json.snippet || \"\").toLowerCase();\n  const fullText = title + \" \" + snippet;\n\n  // ✅ Kiểm tra bài viết có nhắc đến trường và có nội dung tiêu cực không\n  const coTruong = containsAny(fullText, TRUONG_KEYWORDS);\n  const coTieuCuc = containsAny(fullText, TIEU_CUC_KEYWORDS);\n\n  // ✅ Chỉ giữ lại bài viết nếu có cả trường và tiêu cực\n  if (coTruong && coTieuCuc) {\n    // Tìm các từ khóa tiêu cực cụ thể có mặt trong bài\n    const tuKhoaPhatHien = TIEU_CUC_KEYWORDS.filter(k => fullText.includes(k));\n\n    // ✅ Thêm vào kết quả\n    ketQua.push({\n      json: {\n        TieuDe: item.json.title,\n        Link: item.json.link,\n        NoiDung: item.json.snippet,\n        TuKhoa: tuKhoaPhatHien.join(\", \"),\n        NgayPhatHien: ngayPhatHien\n      }\n    });\n  }\n}\n\n// ✅ Trả về danh sách các bài viết hợp lệ\nreturn ketQua;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20,
+        220
+      ],
+      "id": "359e6646-0651-4612-bbd7-6090ba33748d",
+      "name": "Lọc bài viết tiêu cực",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        580,
+        240
+      ],
+      "name": "Gộp bài viết mới với dữ liệu cũ",
+      "id": "0df91236-c30c-4157-9c82-05615707966c"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
+          "mode": "list",
+          "cachedResultName": "Canh Bao",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TieuDe": "={{ $json.TieuDe }}",
+            "Link": "={{ $json.Link }}",
+            "NoiDung": "={{ $json.NoiDung }}",
+            "TuKhoa": "={{ $json.TuKhoa }}",
+            "NgayPhatHien": "={{ $json.NgayPhatHien }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TieuDe",
+              "displayName": "TieuDe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NoiDung",
+              "displayName": "NoiDung",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TuKhoa",
+              "displayName": "TuKhoa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NgayPhatHien",
+              "displayName": "NgayPhatHien",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1120,
+        220
+      ],
+      "name": "Ghi bài viết vào Sheets",
+      "id": "e1710eb0-a098-4aa9-8483-46f5809372ee",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mp77aW2EMpHZZx3M",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
+          "mode": "list",
+          "cachedResultName": "Canh Bao",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        320,
+        260
+      ],
+      "name": "Đọc file Sheets để kiểm tra trùng",
+      "id": "18771d1c-43a9-4738-ab88-04c76bf965b7",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mp77aW2EMpHZZx3M",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Bài viết có tiêu đề \"{{ $json.TieuDe }}\" phản ánh nội dung: {{ $json.NoiDung }}. Nội dung chủ yếu đề cập đến [tóm tắt ngắn gọn vấn đề tiêu cực, ví dụ: chất lượng dịch vụ kém, sai phạm trong quản lý, thái độ nhân viên, sự cố an toàn...].\n\nHướng xử lý:\n\nXác minh thông tin: Liên hệ trực tiếp với tác giả bài viết (nếu có thể) hoặc bộ phận liên quan để thu thập dữ kiện chính xác.\n\nCông khai phản hồi: Đưa ra thông báo chính thức trên kênh truyền thông của tổ chức, ghi nhận phản ánh và cam kết giải quyết (nếu có sai sót).\n\nGiải quyết nội bộ: Rà soát quy trình, đào tạo lại nhân sự hoặc khắc phục sự cố (nếu vấn đề thuộc trách nhiệm của tổ chức).\n\nTheo dõi phản ứng cộng đồng: Đánh giá mức độ lan truyền và điều chỉnh chiến lược truyền thông phù hợp.\n\nChủ động ngăn chặn khủng hoảng mở rộng: Chuẩn bị kịch bản ứng phó nếu bài viết được chia sẻ rộng hoặc bị báo chí đưa tin.\n\nMức độ ảnh hưởng:\n\nThấp: Nếu bài viết có ít tương tác (dưới 100 lượt chia sẻ/like), nội dung chỉ là ý kiến cá nhân, không dẫn chứng cụ thể hoặc không liên quan trực tiếp đến thương hiệu (ví dụ: bài viết tiêu cực về một cá nhân không thuộc tổ chức).\n\nTrung bình: Nếu bài viết có bằng chứng hình ảnh/video, được chia sẻ trong cộng đồng mục tiêu (ví dụ: nhóm khách hàng, phụ huynh học sinh), hoặc gây tranh cãi với 100–1.000 lượt tương tác.\n\nCao: Nếu nội dung liên quan đến sai phạm pháp lý, an toàn tính mạng, tố cáo có hệ thống, hoặc lan truyền mạnh (trên 1.000 lượt chia sẻ, xuất hiện trên báo chí).\n\nDự đoán nguồn bài viết:\n\nMạng xã hội (Facebook/TikTok): Nếu bài viết có ngôn ngữ đời thường, dùng hashtag, đăng trong nhóm kín hoặc kèm video ngắn.\n\nDiễn đàn/Website: Nếu có cấu trúc bài bản, dẫn nguồn dữ liệu hoặc đăng trên trang có tên miền riêng.\n\nBáo chí: Nếu bài viết có văn phong chính thống, dẫn lời chuyên gia hoặc đại diện tổ chức.\n\nCần xác minh thêm: Nếu không rõ nguồn hoặc thiếu thông tin ngữ cảnh.\n\nLưu ý:\n\nNếu bài viết không liên quan đến Trường Cửu Long, mức độ ảnh hưởng có thể xếp Thấp (trừ khi nội dung gián tiếp gây hiểu lầm về thương hiệu).\n\nLuôn đặt tính trung lập lên hàng đầu: Tránh dùng từ ngữ đổ lỗi (ví dụ: \"bài viết cố tình bôi xấu\") thay bằng \"cần kiểm chứng thông tin\".",
+        "options": {
+          "systemMessage": "=Bạn đang đóng vai trò là chuyên gia truyền thông khủng hoảng cấp cao, chuyên xử lý các sự cố ảnh hưởng đến uy tín thương hiệu của tổ chức/doanh nghiệp/trường học.\n\n🔍 HƯỚNG DẪN PHÂN TÍCH\nKhi nhận thông tin về bài viết tiêu cực, bạn cần:\n\nTÓM TẮT VẤN ĐỀ\n\nNgắn gọn, trung lập, chỉ nêu sự kiện khách quan.\n\nGhi rõ nếu thiếu dữ liệu: \"Cần xác minh thêm về [chi tiết cụ thể]\".\n\nĐỀ XUẤT XỬ LÝ (5 gạch đầu dòng)\n\nTập trung vào hành động khả thi, nhanh chóng (kiểm chứng, phản hồi, khắc phục...).\n\nƯu tiên giải pháp bảo vệ hình ảnh thương hiệu và giảm thiểu lan truyền.\n\nĐÁNH GIÁ MỨC ĐỘ ẢNH HƯỞNG\n\nThấp: Nội dung cá nhân, ít bằng chứng, tương tác dưới 100.\n\nTrung bình: Có hình ảnh/video, lan truyền nhóm nhỏ (100–1.000 tương tác), hoặc liên quan đến dịch vụ/uy tín.\n\nCao: Tố cáo nghiêm trọng (pháp lý, an toàn), viral mạnh (trên 1.000 tương tác), hoặc báo chí đưa tin.\n\nDỰ ĐOÁN NGUỒN BÀI VIẾT\n\nPhân tích dựa trên: ngôn ngữ, định dạng (video/ảnh), hashtag, nền tảng được đề cập.\n\nNếu không rõ: \"Cần xác minh thêm\".\n\n📌 FORMAT TRẢ LỜI BẮT BUỘC\nTóm tắt:\n[1–2 câu mô tả sự việc, không bình luận chủ quan]\n\nHướng xử lý:\n\n[Hành động 1] (Ví dụ: Thẩm định tính xác thực thông tin với bộ phận liên quan)\n\n[Hành động 2] (Chuẩn bị bản tuyên bố chính thức nếu cần)\n\n[Hành động 3] (Liên hệ người đăng bài để làm rõ (nếu khả thi))\n\n[Hành động 4] (Giám sát phản ứng MXH để kịp thời điều chỉnh)\n\n[Hành động 5] (Rà soát nội bộ để ngăn ngừa sự cố tái diễn)\n\nMức độ ảnh hưởng:\n[Thấp/Trung bình/Cao] + [Lý do ngắn gọn, ví dụ: \"Bài viết có 50 lượt chia sẻ, chưa có bằng chứng cụ thể\"]\n\nDự đoán nguồn bài viết:\n[Facebook/TikTok/Báo chí...] hoặc \"Cần xác minh thêm\"\n\n🚨 LƯU Ý QUAN TRỌNG\nKhông đổ lỗi: Tránh dùng từ như \"xúc phạm\", \"bịa đặt\" → Thay bằng \"cần kiểm chứng\".\n\nTrung lập: Nếu bài viết không liên quan trực tiếp đến thương hiệu, ghi rõ: \"Nội dung không nhắm vào tổ chức, mức độ ảnh hưởng Thấp\".\n\nƯu tiên tốc độ: Đề xuất xử lý phải có thể triển khai trong 24h.\n\n✅ Ví dụ minh họa (khi nhận prompt về bài viết tố cáo trường học):\nTóm tắt: Bài viết tố cáo trường X thiếu minh bạch trong thu chi phí phụ huynh, kèm ảnh chụp hóa đơn.\nHướng xử lý:\n\nRà soát lại toàn bộ hồ sơ thu chi theo thời gian được đề cập.\n\nLàm việc với Ban đại diện phụ huynh để xác minh thông tin.\n\nCông khai báo cáo tài chính (nếu đủ căn cứ) để minh bạch.\n\nGửi thông báo chính thức đến phụ huynh qua email/zalo.\n\nĐào tạo lại bộ phận kế toán về quy trình lưu trữ hóa đơn.\nMức độ ảnh hưởng: Trung bình (ảnh hưởng đến niềm tin phụ huynh, bài đăng có 300+ lượt chia sẻ).\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        40,
+        440
+      ],
+      "id": "443bee55-27e6-4fea-89b9-5ee2ce031aa6",
+      "name": "Gửi bài cho AI phân tích tiêu cực"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst format = (n) => String(n).padStart(2, '0');\n\nconst formattedNow = `${now.getFullYear()}-${format(now.getMonth() + 1)}-${format(now.getDate())} ${format(now.getHours())}:${format(now.getMinutes())}:${format(now.getSeconds())}`;\n\n\n\n\nconst ketQua = [];\n\n// 👉 Hàm kiểm tra chuỗi trống\nconst isEmpty = (val) => !val || val.trim() === '';\n\n// 👉 Hàm trích nội dung từ output theo tiêu đề phần\nconst extract = (text, label) => {\n  const regex = new RegExp(`${label}\\\\s*([\\\\s\\\\S]*?)(?=\\\\n\\\\n|$)`, 'i');\n  const match = text.match(regex);\n  return match ? match[1].trim() : '';\n};\n\nfor (const item of items) {\n  const data = item.json;\n\n  // 👉 Bỏ qua nếu tất cả các trường đều trống\n  const allFields = [data.tieuDe, data.noiDung, data.huongXuLy, data.mucDoAnhHuong, data.output];\n  if (allFields.every(isEmpty)) continue;\n\n  // 👉 Lấy dữ liệu gốc\n  let tieuDe = data.tieuDe?.trim() || '';\n  let noiDung = data.noiDung?.trim() || '';\n  let huongXuLy = data.huongXuLy?.trim() || '';\n  let mucDoAnhHuong = data.mucDoAnhHuong?.trim() || '';\n  let nguonBaiViet = data.nguonBaiViet?.trim() || 'Cần xác minh thêm';\n\n  // 👉 Ghi đè nếu có output\n  if (!isEmpty(data.output)) {\n    const out = data.output.trim();\n    tieuDe = extract(out, 'Tóm tắt:') || tieuDe;\n    noiDung = extract(out, 'Tóm tắt:') || noiDung;\n    huongXuLy = extract(out, 'Hướng xử lý:') || huongXuLy;\n    mucDoAnhHuong = extract(out, 'Mức độ ảnh hưởng:') || mucDoAnhHuong;\n    nguonBaiViet = extract(out, 'Dự đoán nguồn bài viết:') || nguonBaiViet;\n  }\n\n  // 👉 Nếu vẫn rỗng thì bỏ qua\n  if ([tieuDe, noiDung, huongXuLy, mucDoAnhHuong].every(isEmpty)) continue;\n\n  // 👉 Đưa vào kết quả\n  ketQua.push({\n    json: {\n      tieuDe: tieuDe.slice(0, 100),\n      noiDung,\n      huongXuLy,\n      mucDoAnhHuong,\n      nguonBaiViet,\n      ngayPhatHien: formattedNow\n    }\n  });\n}\n\n// 👉 Trả về danh sách các bài hợp lệ (hoặc [] nếu không có gì)\nreturn ketQua;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        580,
+        440
+      ],
+      "id": "ce9eb6e0-9aee-4ed7-920c-083c90e5f907",
+      "name": "Xử lý kết quả từ AI",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU",
+          "mode": "list",
+          "cachedResultName": "GiamSat_TinTieuCuc_DH_CuuLong",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tiêu đề": "={{ $json.tieuDe }}",
+            "Nội dung tóm tắt": "={{ $json.noiDung }}",
+            "Hướng xử lý": "={{ $json.huongXuLy }}",
+            "Mức độ ảnh hưởng": "={{ $json.mucDoAnhHuong }}",
+            "Ngày phát hiện": "={{ $json.ngayPhatHien }}",
+            "Liên kết": "={{ $('Ghi bài viết vào Sheets').item.json.Link }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tiêu đề",
+              "displayName": "Tiêu đề",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nội dung tóm tắt",
+              "displayName": "Nội dung tóm tắt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hướng xử lý",
+              "displayName": "Hướng xử lý",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mức độ ảnh hưởng",
+              "displayName": "Mức độ ảnh hưởng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Liên kết",
+              "displayName": "Liên kết",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ngày phát hiện",
+              "displayName": "Ngày phát hiện",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1140,
+        440
+      ],
+      "id": "7dc02780-932a-4c4c-a891-c77b860cad1d",
+      "name": "Ghi kết quả xử lý vào Sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "haulailaptrinh@gmail.com",
+        "toEmail": "haulailaptrinh@gmail.com",
+        "subject": "Báo cáo giám sát hàng ngày - ĐH Cửu Long",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      background-color: #f1f1f1;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 20px;\n      max-width: 700px;\n      margin: auto;\n      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    }\n    h2 {\n      color: #b00020;\n      font-size: 20px;\n    }\n    .section {\n      margin-bottom: 16px;\n    }\n    .label {\n      font-weight: bold;\n      color: #555;\n    }\n    .value {\n      margin-top: 4px;\n      white-space: pre-line;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2>📢 {{ $json.tieuDe}}</h2>\n\n    <div class=\"section\">\n      <div class=\"label\">📅 Ngày phát hiện:</div>\n      <div class=\"value\">{{ $json.ngayPhatHien}}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">📌 Tóm tắt nội dung:</div>\n      <div class=\"value\">{{ $json.noiDung }}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">🛠 Hướng xử lý:</div>\n      <div class=\"value\">{{ $json.huongXuLy }}</div>\n    </div>\n\n    {{ $json.mucDoAnhHuong ? `\n    <div class=\"section\">\n      <div class=\"label\">⚠️ Mức độ ảnh hưởng:</div>\n      <div class=\"value\">${$json.mucDoAnhHuong}</div>\n    </div>` : '' }}\n\n    <div class=\"section\">\n      <div class=\"label\">🌐 Nguồn gốc bài viết:</div>\n      <div class=\"value\">{{ $('Ghi bài viết vào Sheets').item.json.Link}}</div>\n    </div>\n\n    {{ $json.lienKet ? `\n    <div class=\"section\">\n      <div class=\"label\">🔗 Đường dẫn:</div>\n      <div class=\"value\"><a href=\"${$json.lienKet}\" target=\"_blank\">${$json.lienKet}</a></div>\n    </div>` : '' }}\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        620
+      ],
+      "id": "ddd10a57-53c0-4e05-97d3-c4027ed78b92",
+      "name": "Gửi Email cảnh báo hằng ngày",
+      "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
+      "credentials": {
+        "smtp": {
+          "id": "ykRTZzpRksIGSFK2",
+          "name": "SMTP account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      // 🔴 Truy vấn bài viết TIÊU CỰC từ nhiều báo lớn\n      url: 'https://www.googleapis.com/customsearch/v1' +\n           '?key=AIzaSyB3PDXiDlu_tkgDEdEAxBQr-B0dGyxhpR4' +\n           '&cx=05e000f8883424efe' +\n           '&q=(' +\n             '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"MKU\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n           ') AND (' +\n             '\"lừa đảo\" OR \"gian lận\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"dối trá\" OR ' +\n             '\"bóc phốt\" OR \"mập mờ\" OR \"thiếu minh bạch\" OR \"giả mạo\" OR \"mất uy tín\" OR ' +\n             '\"hạ chuẩn\" OR \"tẩy chay\" OR \"bị tố\" OR \"bê bối\" OR \"đình chỉ\" OR \"chất lượng kém\" OR ' +\n             '\"phản ánh tiêu cực\" OR \"tranh cãi\" OR \"gian dối\" OR \"bất công\" OR \"hứa suông\" OR ' +\n             '\"làm tiền\" OR \"đa cấp\" OR \"có dấu hiệu sai phạm\"' +\n           ') ' +\n           'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n           '&sort=date'\n    }\n  },\n  {\n    json: {\n      // 🟢 Truy vấn bài viết TÍCH CỰC hoặc TRUNG LẬP từ nhiều báo lớn\n      url: 'https://www.googleapis.com/customsearch/v1' +\n           '?key=AIzaSyAZtareloJF4KyfWa3uh3D0BZK6q6gy2mc' +\n           '&cx=d4dca59fecce44659' +\n           '&q=(' +\n             '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"MKU\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n           ') ' +\n           'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n           '&sort=date'\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        0
+      ],
+      "id": "84fde61a-8fb8-4b68-9282-bed65c13fad7",
+      "name": "Tạo danh sách URL"
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        0
+      ],
+      "id": "4ffdde69-3561-4ba1-8547-fafae021c7ef",
+      "name": "Wait",
+      "webhookId": "96dbd6a4-02d1-455a-9fe0-d6081db7b5ba"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bd0c5c39-1b95-4ae9-823e-9dfb8bdd3239",
+              "leftValue": "={{ $json.tieuDe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "fef2c729-e2f1-48f2-a09c-6e14104bc3a9",
+              "leftValue": "={{ $json.noiDung }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        860,
+        440
+      ],
+      "id": "55b8f9f5-38fc-43c8-929f-2d8a15e18119",
+      "name": "Kiểm tra bài viết rỗng"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Bước 1: Tách dữ liệu cũ và mới ---\nconst sheetRows = [];\nconst newRows = [];\n\nfor (const item of items) {\n  const data = item.json;\n  if (data.row_number !== undefined) {\n    sheetRows.push(data); // Dữ liệu đã có trên Google Sheet\n  } else {\n    newRows.push(data); // Dữ liệu mới\n  }\n}\n\n// --- Bước 2: Tạo danh sách link đã có ---\nconst existingLinks = new Set();\nfor (const row of sheetRows) {\n  if (typeof row.Link === 'string') {\n    existingLinks.add(row.Link.toLowerCase().trim());\n  }\n}\n\n// --- Bước 3: Lọc bài mới chưa có link ---\nconst ketQua = [];\nfor (const row of newRows) {\n  const link = row.Link?.toLowerCase().trim();\n  if (link && !existingLinks.has(link)) {\n    ketQua.push({ json: row });\n  }\n}\n\n// --- Bước 4: Trả kết quả cho n8n ---\nreturn ketQua;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        220
+      ],
+      "name": "Kiểm tra bài viết trùng",
+      "id": "7b142449-626b-4e7a-b9f7-f2d3bfb347a2",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gửi bài cho AI phân tích tiêu cực",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tập lịch chạy": {
+      "main": [
+        [
+          {
+            "node": "Tạo danh sách URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gửi request tìm bài viết": {
+      "main": [
+        [
+          {
+            "node": "Tách danh sách bài viết",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tách danh sách bài viết": {
+      "main": [
+        [
+          {
+            "node": "Lọc bài viết tiêu cực",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lọc bài viết tiêu cực": {
+      "main": [
+        [
+          {
+            "node": "Gộp bài viết mới với dữ liệu cũ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Đọc file Sheets để kiểm tra trùng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gộp bài viết mới với dữ liệu cũ": {
+      "main": [
+        [
+          {
+            "node": "Kiểm tra bài viết trùng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ghi bài viết vào Sheets": {
+      "main": [
+        [
+          {
+            "node": "Gửi bài cho AI phân tích tiêu cực",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Đọc file Sheets để kiểm tra trùng": {
+      "main": [
+        [
+          {
+            "node": "Gộp bài viết mới với dữ liệu cũ",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gửi bài cho AI phân tích tiêu cực": {
+      "main": [
+        [
+          {
+            "node": "Xử lý kết quả từ AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xử lý kết quả từ AI": {
+      "main": [
+        [
+          {
+            "node": "Kiểm tra bài viết rỗng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tạo danh sách URL": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Gửi request tìm bài viết",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kiểm tra bài viết rỗng": {
+      "main": [
+        [
+          {
+            "node": "Ghi kết quả xử lý vào Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gửi Email cảnh báo hằng ngày",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kiểm tra bài viết trùng": {
+      "main": [
+        [
+          {
+            "node": "Ghi bài viết vào Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0189f4b9-d57a-4fe1-8617-13b18df074db",
+  "meta": {
+    "instanceId": "dc11cb4891443fae026bd649ce2af9b7a75f9d81700ccc3935ac1d32053faa0e"
+  },
+  "id": "SvYtfdpFXqLaakh0",
+  "tags": []
+}
