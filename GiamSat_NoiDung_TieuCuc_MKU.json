@@ -1,5 +1,4 @@
 {
-  "name": "MKU_21_07_H",
   "nodes": [
     {
       "parameters": {
@@ -8,8 +7,8 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
-      "position": [-260, 660],
-      "id": "2cd2fc17-da59-4fa9-a7fb-aba4c4bd241f",
+      "position": [-820, 1180],
+      "id": "7cca58ea-0f81-40bc-95e2-da5960146489",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
@@ -25,20 +24,9 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [580, 20],
-      "id": "16000f8f-397a-4fa3-95ab-5c79254a9d82",
+      "position": [20, 540],
+      "id": "1bdf4942-811f-43d8-b8e9-0bbac89ced22",
       "name": "Gửi request tìm bài viết"
-    },
-    {
-      "parameters": {
-        "jsCode": "// 👉 Tạo một mảng trống để lưu toàn bộ kết quả từ nhiều nguồn khác nhau\nconst allItems = [];\n\nfor (const input of items) {\n  // 👉 Lấy danh sách kết quả tìm kiếm từ Custom Search API (nếu có)\n  const results = input.json.items || [];\n  \n\n  // 👉 Duyệt qua từng kết quả trong `items`\n  for (const item of results) {\n    // 👉 Đẩy mỗi kết quả vào mảng `allItems` dưới dạng một object chuẩn\n    allItems.push({\n      json: {\n        title: item.title || '',       \n        link: item.link || '',         \n        snippet: item.snippet || '',               \n      }\n    });\n  }\n}\n\n// 👉 Trả về toàn bộ kết quả đã hợp nhất từ nhiều nguồn\nreturn allItems;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [860, 20],
-      "id": "f0ef6508-3dfb-43e9-8717-d97ffe4f1139",
-      "name": "Tách danh sách bài viết",
-      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -46,8 +34,8 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-260, 240],
-      "id": "992e5117-50ae-46b5-84e1-b2ca412e4ea7",
+      "position": [-820, 760],
+      "id": "41b16611-4c53-4069-98e8-40083d385d39",
       "name": "Lọc bài viết tiêu cực",
       "alwaysOutputData": true
     },
@@ -55,9 +43,9 @@
       "parameters": {},
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [300, 260],
+      "position": [-260, 780],
       "name": "Gộp bài viết mới với dữ liệu cũ",
-      "id": "c0b746e6-9e15-4ece-89d8-d8763a2e4ec4"
+      "id": "6a0a4e9c-0136-4cf9-9089-520e67ce9bc4"
     },
     {
       "parameters": {
@@ -141,9 +129,9 @@
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
-      "position": [840, 240],
+      "position": [280, 760],
       "name": "Ghi bài viết vào Sheets",
-      "id": "c1b228a2-5573-4407-81ef-0c33211a295d",
+      "id": "dca30b38-9b9e-441d-b7f5-3f4491de342e",
       "credentials": {
         "googleApi": {
           "id": "bDfKP49GQmA772n5",
@@ -172,9 +160,9 @@
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
-      "position": [40, 280],
+      "position": [-520, 800],
       "name": "Đọc file Sheets để kiểm tra trùng",
-      "id": "02d84b2a-6edd-4590-99da-92a39616b2f1",
+      "id": "282d8a48-ee0c-48a9-8948-df7fbb4de044",
       "credentials": {
         "googleApi": {
           "id": "bDfKP49GQmA772n5",
@@ -192,8 +180,8 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
-      "position": [-240, 460],
-      "id": "16b39bf2-aeaf-4436-a10a-aee86404a73e",
+      "position": [-800, 980],
+      "id": "2d38d1c4-1494-4ec5-a48c-12fb53d60211",
       "name": "Gửi bài cho AI phân tích tiêu cực"
     },
     {
@@ -202,8 +190,8 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [300, 460],
-      "id": "cb0178c2-c8be-476b-a63b-5af6d0496bc2",
+      "position": [-260, 980],
+      "id": "6295f581-5777-45c8-87e1-b86386d29003",
       "name": "Xử lý kết quả từ AI",
       "alwaysOutputData": true
     },
@@ -299,8 +287,8 @@
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [860, 460],
-      "id": "6a11bd9b-44d1-455d-b5d7-199a33a84511",
+      "position": [340, 980],
+      "id": "f1c947fe-c98e-4d8c-a7f1-4af7fc368def",
       "name": "Ghi kết quả xử lý vào Sheets",
       "credentials": {
         "googleApi": {
@@ -320,8 +308,8 @@
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [920, 640],
-      "id": "37a1f194-02c5-41af-901d-34b1cd1e1e48",
+      "position": [340, 1140],
+      "id": "c532d9b0-60f3-4c0f-85f7-238ba50f6738",
       "name": "Gửi Email cảnh báo hằng ngày",
       "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
       "credentials": {
@@ -330,18 +318,6 @@
           "name": "SMTP account 3"
         }
       }
-    },
-    {
-      "parameters": {
-        "amount": 2,
-        "unit": "minutes"
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [300, 20],
-      "id": "f32f6b75-dc54-4dcd-8009-c7be04ffb782",
-      "name": "Wait",
-      "webhookId": "96dbd6a4-02d1-455a-9fe0-d6081db7b5ba"
     },
     {
       "parameters": {
@@ -380,8 +356,8 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [580, 460],
-      "id": "9fa2097a-f8ee-4698-af88-0bdfbc039cf0",
+      "position": [20, 980],
+      "id": "11380458-2ba1-420a-a10c-8179c49e89cc",
       "name": "Kiểm tra bài viết rỗng"
     },
     {
@@ -390,9 +366,9 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [580, 240],
+      "position": [20, 760],
       "name": "Kiểm tra bài viết trùng",
-      "id": "c4ba3d8f-6010-4cca-8e54-918d0a5c431d",
+      "id": "120e6d66-7e0b-4eb2-aebe-7492c6f6ab0c",
       "alwaysOutputData": true
     },
     {
@@ -401,8 +377,8 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [0, 0],
-      "id": "b2738245-3040-4771-aa30-3de4c9fd42f5",
+      "position": [660, 460],
+      "id": "37a6c01a-0f7c-42de-a886-0479ccebb1cb",
       "name": "Tạo danh sách URL1"
     },
     {
@@ -418,9 +394,9 @@
       },
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
-      "position": [-260, 20],
+      "position": [-820, 540],
       "name": "Tập lịch chạy",
-      "id": "23c96a20-ae39-4b65-a52f-91ede03b33c6"
+      "id": "f7cbc339-b82c-4b1d-945a-4d18632f48db"
     },
     {
       "parameters": {
@@ -434,9 +410,9 @@
       },
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
-      "position": [-260, -300],
+      "position": [-820, 220],
       "name": "Tập lịch chạy mỗi tuần",
-      "id": "6bda5b99-9754-4e17-bd46-75240d4a449d"
+      "id": "08b7dd45-22a1-47ae-83d6-d468166ce373"
     },
     {
       "parameters": {
@@ -459,8 +435,8 @@
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [0, -340],
-      "id": "dfc66e34-8169-4594-9297-736285e1278c",
+      "position": [-560, 180],
+      "id": "256c5658-5601-4686-bffd-a89e33973a3a",
       "name": "Đọc dữ liệu",
       "credentials": {
         "googleApi": {
@@ -475,8 +451,8 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, -320],
-      "id": "188435d5-15f2-4098-9ed3-ddcafe236304",
+      "position": [-340, 200],
+      "id": "95685b31-0103-408f-b808-f4412f4e621b",
       "name": "Xử lý mức độ"
     },
     {
@@ -485,8 +461,8 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, -320],
-      "id": "b2db7641-52cf-4276-a7bf-f61c14ae8041",
+      "position": [-120, 200],
+      "id": "d49afac7-88e0-46bc-b63b-010770f597bb",
       "name": "Tổng hợp theo tuần"
     },
     {
@@ -581,8 +557,8 @@
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [760, -380],
-      "id": "ba08ff38-7129-448f-82c9-ec355c51e84e",
+      "position": [200, 140],
+      "id": "02302db7-8c05-4fe0-aec6-5327e653ae2e",
       "name": "Ghi kết quả báo cáo tuần",
       "credentials": {
         "googleApi": {
@@ -602,8 +578,8 @@
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
-      "position": [780, -180],
-      "id": "68a1a667-7de8-4cab-8881-ff4182f2fabc",
+      "position": [220, 340],
+      "id": "ba53cb7e-4f4e-4590-af1a-3481178e9a50",
       "name": "Gửi Email cảnh báo hằng tuần",
       "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
       "credentials": {
@@ -612,9 +588,29 @@
           "name": "SMTP account 3"
         }
       }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n    url: 'https://www.googleapis.com/customsearch/v1' +\n     '?key=AIzaSyBq5FP4LyvWBz6cewIngXfI901H6hBTsIQ' +\n     '&cx=1030afc45228a4135' +\n     '&q=(' +\n       '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"MKU\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n     ') ' + \n     '(' +\n       '\"lừa đảo\" OR \"gian lận\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"dối trá\" OR ' +\n       '\"bóc phốt\" OR \"mập mờ\" OR \"thiếu minh bạch\" OR \"giả mạo\" OR \"mất uy tín\" OR ' +\n       '\"hạ chuẩn\" OR \"tẩy chay\" OR \"bị tố\" OR \"bê bối\" OR \"đình chỉ\" OR \"chất lượng kém\" OR ' +\n       '\"phản ánh tiêu cực\" OR \"tranh cãi\" OR \"gian dối\" OR \"bất công\" OR \"hứa suông\" OR ' +\n       '\"làm tiền\" OR \"đa cấp\" OR \"có dấu hiệu sai phạm\"' +\n     ') ' +\n     'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n     '&sort=date'\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-400, 500],
+      "id": "61ae9225-2c6d-460c-895d-4bce85c90c00",
+      "name": "Tạo danh sách URL"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 👉 Tạo một mảng trống để lưu toàn bộ kết quả từ nhiều nguồn khác nhau\nconst allItems = [];\n\nfor (const input of items) {\n  // 👉 Lấy danh sách kết quả tìm kiếm từ Custom Search API (nếu có)\n  const results = input.json.items || [];\n  \n\n  // 👉 Duyệt qua từng kết quả trong `items`\n  for (const item of results) {\n    // 👉 Đẩy mỗi kết quả vào mảng `allItems` dưới dạng một object chuẩn\n    allItems.push({\n      json: {\n        title: item.title || '',       \n        link: item.link || '',         \n        snippet: item.snippet || '',               \n      }\n    });\n  }\n}\n\n// 👉 Trả về toàn bộ kết quả đã hợp nhất từ nhiều nguồn\nreturn allItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 540],
+      "id": "2fc892cd-bec8-4f1f-a941-0d3c10a6921e",
+      "name": "Tách danh sách bài viết",
+      "alwaysOutputData": true
     }
   ],
-  "pinData": {},
   "connections": {
     "Google Gemini Chat Model": {
       "ai_languageModel": [
@@ -632,17 +628,6 @@
         [
           {
             "node": "Tách danh sách bài viết",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tách danh sách bài viết": {
-      "main": [
-        [
-          {
-            "node": "Lọc bài viết tiêu cực",
             "type": "main",
             "index": 0
           }
@@ -720,17 +705,6 @@
         ]
       ]
     },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Gửi request tìm bài viết",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Kiểm tra bài viết rỗng": {
       "main": [
         [
@@ -759,21 +733,13 @@
       ]
     },
     "Tạo danh sách URL1": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[]]
     },
     "Tập lịch chạy": {
       "main": [
         [
           {
-            "node": "Tạo danh sách URL1",
+            "node": "Tạo danh sách URL",
             "type": "main",
             "index": 0
           }
@@ -828,17 +794,33 @@
           }
         ]
       ]
+    },
+    "Tạo danh sách URL": {
+      "main": [
+        [
+          {
+            "node": "Gửi request tìm bài viết",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tách danh sách bài viết": {
+      "main": [
+        [
+          {
+            "node": "Lọc bài viết tiêu cực",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "72adff18-332f-4ade-a2c3-09770b2e93c5",
+  "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "dc11cb4891443fae026bd649ce2af9b7a75f9d81700ccc3935ac1d32053faa0e"
-  },
-  "id": "ADrnZcD3GkAquBvz",
-  "tags": []
+  }
 }
