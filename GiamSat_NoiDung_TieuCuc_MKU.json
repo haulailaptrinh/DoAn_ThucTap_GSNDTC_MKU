@@ -373,16 +373,6 @@
     },
     {
       "parameters": {
-        "jsCode": "return [\n  {\n    json: {\n    url: 'https://www.googleapis.com/customsearch/v1' +\n     '?key=AIzaSyB3PDXiDlu_tkgDEdEAxBQr-B0dGyxhpR4' +\n     '&cx=05e000f8883424efe' +\n     '&q=(' +\n       '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"MKU\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n     ') ' + \n     '(' +\n       '\"lừa đảo\" OR \"gian lận\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"dối trá\" OR ' +\n       '\"bóc phốt\" OR \"mập mờ\" OR \"thiếu minh bạch\" OR \"giả mạo\" OR \"mất uy tín\" OR ' +\n       '\"hạ chuẩn\" OR \"tẩy chay\" OR \"bị tố\" OR \"bê bối\" OR \"đình chỉ\" OR \"chất lượng kém\" OR ' +\n       '\"phản ánh tiêu cực\" OR \"tranh cãi\" OR \"gian dối\" OR \"bất công\" OR \"hứa suông\" OR ' +\n       '\"làm tiền\" OR \"đa cấp\" OR \"có dấu hiệu sai phạm\"' +\n     ') ' +\n     'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n     '&sort=date'\n    }\n  }\n];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [660, 460],
-      "id": "37a6c01a-0f7c-42de-a886-0479ccebb1cb",
-      "name": "Tạo danh sách URL1"
-    },
-    {
-      "parameters": {
         "rule": {
           "interval": [
             {
@@ -467,108 +457,6 @@
     },
     {
       "parameters": {
-        "authentication": "serviceAccount",
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk",
-          "mode": "list",
-          "cachedResultName": "Bao_Cao_Tuan",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk/edit#gid=0"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Từ ngày": "={{ $json['Từ ngày'] }}",
-            "Đến ngày": "={{ $json['Đến ngày'] }}",
-            "Cao": "={{ $json.Cao }}",
-            "Trung bình": "={{ $json['Trung bình'] }}",
-            "Thấp": "={{ $json['Thấp'] }}",
-            "Tổng": "={{ $json['Tổng'] }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "Từ ngày",
-              "displayName": "Từ ngày",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Đến ngày",
-              "displayName": "Đến ngày",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Cao",
-              "displayName": "Cao",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Trung bình",
-              "displayName": "Trung bình",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Thấp",
-              "displayName": "Thấp",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Tổng",
-              "displayName": "Tổng",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
-      "position": [200, 140],
-      "id": "02302db7-8c05-4fe0-aec6-5327e653ae2e",
-      "name": "Ghi kết quả báo cáo tuần",
-      "credentials": {
-        "googleApi": {
-          "id": "bDfKP49GQmA772n5",
-          "name": "API Sheets"
-        }
-      }
-    },
-    {
-      "parameters": {
         "fromEmail": "haulailaptrinh@gmail.com",
         "toEmail": "haulailaptrinh@gmail.com",
         "subject": "Báo cáo giám sát hàng ngày - ĐH Cửu Long",
@@ -591,7 +479,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [\n  {\n    json: {\n    url: 'https://www.googleapis.com/customsearch/v1' +\n     '?key=AIzaSyBq5FP4LyvWBz6cewIngXfI901H6hBTsIQ' +\n     '&cx=1030afc45228a4135' +\n     '&q=(' +\n       '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"MKU\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n     ') ' + \n     '(' +\n       '\"lừa đảo\" OR \"gian lận\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"dối trá\" OR ' +\n       '\"bóc phốt\" OR \"mập mờ\" OR \"thiếu minh bạch\" OR \"giả mạo\" OR \"mất uy tín\" OR ' +\n       '\"hạ chuẩn\" OR \"tẩy chay\" OR \"bị tố\" OR \"bê bối\" OR \"đình chỉ\" OR \"chất lượng kém\" OR ' +\n       '\"phản ánh tiêu cực\" OR \"tranh cãi\" OR \"gian dối\" OR \"bất công\" OR \"hứa suông\" OR ' +\n       '\"làm tiền\" OR \"đa cấp\" OR \"có dấu hiệu sai phạm\"' +\n     ') ' +\n     'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n     '&sort=date'\n    }\n  }\n];\n"
+        "jsCode": "return [\n  {\n    json: {\n      url: 'https://www.googleapis.com/customsearch/v1' +\n        '?key=AIzaSyBq5FP4LyvWBz6cewIngXfI901H6hBTsIQ' +\n        '&cx=1030afc45228a4135' +\n        '&q=(' +\n          '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n        ') ' +\n        '(' +\n          '\"lừa đảo\" OR \"gian lận\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"dối trá\" OR ' +\n          '\"bóc phốt\" OR \"mập mờ\" OR \"thiếu minh bạch\" OR \"giả mạo\" OR \"mất uy tín\" OR ' +\n          '\"hạ chuẩn\" OR \"tẩy chay\" OR \"bị tố\" OR \"bê bối\" OR \"đình chỉ\" OR \"chất lượng kém\" OR ' +\n          '\"phản ánh tiêu cực\" OR \"tranh cãi\" OR \"gian dối\" OR \"bất công\" OR \"hứa suông\" OR ' +\n          '\"làm tiền\" OR \"đa cấp\" OR \"có dấu hiệu sai phạm\"' +\n        ') ' +\n        // Gợi ý ngữ cảnh giáo dục\n        '(\"tuyển sinh\" OR \"giảng viên\" OR \"đào tạo\" OR \"sinh viên\" OR \"bằng cấp\") ' +\n        // Từ khóa loại trừ\n        '-\"cá cược\" -\"nhà cái\" -\"soi kèo\" -\"bóng đá\" -\"casino\" -\"xổ số\" -\"lô đề\" -\"đánh bạc\" -\"tiền ảo\" ' +\n        'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n        '&sort=date' +\n        '&lr=lang_vi' +\n        '&gl=vn'\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -732,9 +620,6 @@
         ]
       ]
     },
-    "Tạo danh sách URL1": {
-      "main": [[]]
-    },
     "Tập lịch chạy": {
       "main": [
         [
@@ -782,11 +667,6 @@
     "Tổng hợp theo tuần": {
       "main": [
         [
-          {
-            "node": "Ghi kết quả báo cáo tuần",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "Gửi Email cảnh báo hằng tuần",
             "type": "main",
