@@ -55,7 +55,7 @@
           "__rl": true,
           "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
           "mode": "list",
-          "cachedResultName": "Canh Bao",
+          "cachedResultName": "Canh_Bao",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -146,7 +146,7 @@
           "__rl": true,
           "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
           "mode": "list",
-          "cachedResultName": "Canh Bao",
+          "cachedResultName": "Canh_Bao",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -186,11 +186,11 @@
     },
     {
       "parameters": {
-        "jsCode": "const now = new Date();\n\nconst format = (n) => String(n).padStart(2, '0');\n\nconst formattedNow = `${now.getFullYear()}-${format(now.getMonth() + 1)}-${format(now.getDate())} ${format(now.getHours())}:${format(now.getMinutes())}:${format(now.getSeconds())}`;\n\n\n\n\nconst ketQua = [];\n\n// 👉 Hàm kiểm tra chuỗi trống\nconst isEmpty = (val) => !val || val.trim() === '';\n\n// 👉 Hàm trích nội dung từ output theo tiêu đề phần\nconst extract = (text, label) => {\n  const regex = new RegExp(`${label}\\\\s*([\\\\s\\\\S]*?)(?=\\\\n\\\\n|$)`, 'i');\n  const match = text.match(regex);\n  return match ? match[1].trim() : '';\n};\n\nfor (const item of items) {\n  const data = item.json;\n\n  // 👉 Bỏ qua nếu tất cả các trường đều trống\n  const allFields = [data.tieuDe, data.noiDung, data.huongXuLy, data.mucDoAnhHuong, data.output];\n  if (allFields.every(isEmpty)) continue;\n\n  // 👉 Lấy dữ liệu gốc\n  let tieuDe = data.tieuDe?.trim() || '';\n  let noiDung = data.noiDung?.trim() || '';\n  let huongXuLy = data.huongXuLy?.trim() || '';\n  let mucDoAnhHuong = data.mucDoAnhHuong?.trim() || '';\n  let nguonBaiViet = data.nguonBaiViet?.trim() || 'Cần xác minh thêm';\n\n  // 👉 Ghi đè nếu có output\n  if (!isEmpty(data.output)) {\n    const out = data.output.trim();\n    tieuDe = extract(out, 'Tóm tắt:') || tieuDe;\n    noiDung = extract(out, 'Tóm tắt:') || noiDung;\n    huongXuLy = extract(out, 'Hướng xử lý:') || huongXuLy;\n    mucDoAnhHuong = extract(out, 'Mức độ ảnh hưởng:') || mucDoAnhHuong;\n    nguonBaiViet = extract(out, 'Dự đoán nguồn bài viết:') || nguonBaiViet;\n  }\n\n  // 👉 Nếu vẫn rỗng thì bỏ qua\n  if ([tieuDe, noiDung, huongXuLy, mucDoAnhHuong].every(isEmpty)) continue;\n\n  // 👉 Đưa vào kết quả\n  ketQua.push({\n    json: {\n      tieuDe: tieuDe.slice(0, 100),\n      noiDung,\n      huongXuLy,\n      mucDoAnhHuong,\n      nguonBaiViet,\n      ngayPhatHien: formattedNow\n    }\n  });\n}\n\n// 👉 Trả về danh sách các bài hợp lệ (hoặc [] nếu không có gì)\nreturn ketQua;\n"
+        "jsCode": "const now = new Date();\n\nconst format = (n) => String(n).padStart(2, '0');\n\nconst formattedNow = `${now.getFullYear()}-${format(now.getMonth() + 1)}-${format(now.getDate())} ${format(now.getHours())}:${format(now.getMinutes())}:${format(now.getSeconds())}`;\n\nconst ketQua = [];\n\nconst isEmpty = (val) => !val || val.trim() === '';\n\nconst extract = (text, label) => {\n  const regex = new RegExp(`${label}\\\\s*([\\\\s\\\\S]*?)(?=\\\\n\\\\n|$)`, 'i');\n  const match = text.match(regex);\n  return match ? match[1].trim() : '';\n};\n\nlet id = 14; // 👉 Bắt đầu từ ID 14\n\nfor (const item of items) {\n  const data = item.json;\n\n  const allFields = [data.tieuDe, data.noiDung, data.huongXuLy, data.mucDoAnhHuong, data.output];\n  if (allFields.every(isEmpty)) continue;\n\n  let tieuDe = data.tieuDe?.trim() || '';\n  let noiDung = data.noiDung?.trim() || '';\n  let huongXuLy = data.huongXuLy?.trim() || '';\n  let mucDoAnhHuong = data.mucDoAnhHuong?.trim() || '';\n  let nguonBaiViet = data.nguonBaiViet?.trim() || 'Cần xác minh thêm';\n\n  if (!isEmpty(data.output)) {\n    const out = data.output.trim();\n    tieuDe = extract(out, 'Tóm tắt:') || tieuDe;\n    noiDung = extract(out, 'Tóm tắt:') || noiDung;\n    huongXuLy = extract(out, 'Hướng xử lý:') || huongXuLy;\n    mucDoAnhHuong = extract(out, 'Mức độ ảnh hưởng:') || mucDoAnhHuong;\n    nguonBaiViet = extract(out, 'Dự đoán nguồn bài viết:') || nguonBaiViet;\n  }\n\n  if ([tieuDe, noiDung, huongXuLy, mucDoAnhHuong].every(isEmpty)) continue;\n\n  ketQua.push({\n    json: {\n      id: id++, // 👉 Gán và tăng id\n      tieuDe: tieuDe.slice(0, 100),\n      noiDung,\n      huongXuLy,\n      mucDoAnhHuong,\n      nguonBaiViet,\n      ngayPhatHien: formattedNow\n    }\n  });\n}\n\nreturn ketQua;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-260, 980],
+      "position": [-260, 1000],
       "id": "6295f581-5777-45c8-87e1-b86386d29003",
       "name": "Xử lý kết quả từ AI",
       "alwaysOutputData": true
@@ -203,7 +203,7 @@
           "__rl": true,
           "value": "1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU",
           "mode": "list",
-          "cachedResultName": "GiamSat_TinTieuCuc_DH_CuuLong",
+          "cachedResultName": "Xu_Ly_Bai_Viet",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -216,63 +216,79 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Tiêu đề": "={{ $json.tieuDe }}",
-            "Nội dung tóm tắt": "={{ $json.noiDung }}",
-            "Hướng xử lý": "={{ $json.huongXuLy }}",
-            "Mức độ ảnh hưởng": "={{ $json.mucDoAnhHuong }}",
-            "Ngày phát hiện": "={{ $json.ngayPhatHien }}",
-            "Liên kết": "={{ $('Ghi bài viết vào Sheets').item.json.Link }}"
+            "XuLyID": "={{ $json.id }}",
+            "TieuDe": "={{ $json.tieuDe }}",
+            "NoiDungTomTat": "={{ $json.noiDung }}",
+            "HuongXuLy": "={{ $json.huongXuLy }}",
+            "MucDoAnhHuong": "={{ $json.mucDoAnhHuong }}",
+            "NgayPhatHien": "={{ $json.ngayPhatHien }}",
+            "LienKet": "={{ $('Ghi bài viết vào Sheets').item.json.Link }}"
           },
           "matchingColumns": [],
           "schema": [
             {
-              "id": "Tiêu đề",
-              "displayName": "Tiêu đề",
+              "id": "TieuDe",
+              "displayName": "TieuDe",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
-              "id": "Nội dung tóm tắt",
-              "displayName": "Nội dung tóm tắt",
+              "id": "NoiDungTomTat",
+              "displayName": "NoiDungTomTat",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
-              "id": "Hướng xử lý",
-              "displayName": "Hướng xử lý",
+              "id": "HuongXuLy",
+              "displayName": "HuongXuLy",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
-              "id": "Mức độ ảnh hưởng",
-              "displayName": "Mức độ ảnh hưởng",
+              "id": "MucDoAnhHuong",
+              "displayName": "MucDoAnhHuong",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
-              "id": "Liên kết",
-              "displayName": "Liên kết",
+              "id": "LienKet",
+              "displayName": "LienKet",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
-              "id": "Ngày phát hiện",
-              "displayName": "Ngày phát hiện",
+              "id": "NgayPhatHien",
+              "displayName": "NgayPhatHien",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "XuLyID",
+              "displayName": "XuLyID",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -314,8 +330,8 @@
       "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
       "credentials": {
         "smtp": {
-          "id": "ykRTZzpRksIGSFK2",
-          "name": "SMTP account 3"
+          "id": "u9TNW1SRBYGnm2Wa",
+          "name": "SMTP account 2"
         }
       }
     },
@@ -411,7 +427,7 @@
           "__rl": true,
           "value": "1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU",
           "mode": "list",
-          "cachedResultName": "GiamSat_TinTieuCuc_DH_CuuLong",
+          "cachedResultName": "Xu_Ly_Bai_Viet",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -437,7 +453,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Sắp xếp bài viết theo mức độ ưu tiên: Cao > Trung > Thấp\nconst uuTien = { \"Cao\": 3, \"Trung\": 2, \"Thấp\": 1 };\n\n// Lấy toàn bộ dữ liệu đầu vào và xử lý\nconst ketQua = $input.all()\n  .sort((a, b) => {\n    const aMuc = a.json[\"Mức độ ảnh hưởng\"]?.split(\" \")[0] || \"\";\n    const bMuc = b.json[\"Mức độ ảnh hưởng\"]?.split(\" \")[0] || \"\";\n    return (uuTien[bMuc] || 0) - (uuTien[aMuc] || 0);\n  })\n  .map((item, index) => ({\n    json: {\n      STT: index + 1,\n      Tiêu_đề: item.json[\"Tiêu đề\"] || \"Không rõ\",\n      Nội_dung: item.json[\"Nội dung tóm tắt\"] || \"Không rõ\",\n      Hướng_xử_lý: item.json[\"Hướng xử lý\"] || \"Không rõ\",\n      Mức_độ: item.json[\"Mức độ ảnh hưởng\"] || \"Không rõ\",\n      Liên_kết: item.json[\"Liên kết\"] || \"Không rõ\",\n      Ngày_phát_hiện: item.json[\"Ngày phát hiện\"] || \"Không rõ\"\n    }\n  }));\n\nreturn ketQua;\n"
+        "jsCode": "// Sắp xếp bài viết theo mức độ ưu tiên: Cao > Trung > Thấp\nconst uuTien = { \"Cao\": 3, \"Trung\": 2, \"Thấp\": 1 };\n\n// Lấy toàn bộ dữ liệu đầu vào và xử lý\nconst ketQua = $input.all()\n  .sort((a, b) => {\n    const aMuc = a.json[\"Mức độ ảnh hưởng\"]?.split(\" \")[0] || \"\";\n    const bMuc = b.json[\"Mức độ ảnh hưởng\"]?.split(\" \")[0] || \"\";\n    return (uuTien[bMuc] || 0) - (uuTien[aMuc] || 0);\n  })\n  .map((item, index) => ({\n    json: {\n      STT: index + 1,\n      Tiêu_đề: item.json[\"TieuDe\"] || \"Không rõ\",\n      Nội_dung: item.json[\"NoiDungTomTat\"] || \"Không rõ\",\n      Hướng_xử_lý: item.json[\"HuongXuLy\"] || \"Không rõ\",\n      Mức_độ: item.json[\"MucDoAnhHuong\"] || \"Không rõ\",\n      Liên_kết: item.json[\"LienKet\"] || \"Không rõ\",\n      Ngày_phát_hiện: item.json[\"NgayPhatHien\"] || \"Không rõ\"\n    }\n  }));\n\nreturn ketQua;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -447,7 +463,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Đếm số bài viết theo mức độ\nlet cao = 0, trung = 0, thap = 0;\n\nfor (const item of $input.all()) {\n  const muc = item.json[\"Mức_độ\"]?.split(\" \")[0]; // Lấy chữ đầu\n  if (muc === \"Cao\") cao++;\n  else if (muc === \"Trung\") trung++;\n  else if (muc === \"Thấp\") thap++;\n}\n\nconst tong = cao + trung + thap;\n\n// Lấy ngày hiện tại theo giờ Việt Nam (UTC+7)\nconst now = new Date();\nnow.setUTCHours(now.getUTCHours() + 7);\n\n// Tính ngày đầu tuần (thứ 2) và cuối tuần (chủ nhật)\nconst dayOfWeek = now.getDay(); // Chủ nhật = 0\nconst monday = new Date(now);\nmonday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));\nconst sunday = new Date(monday);\nsunday.setDate(monday.getDate() + 6);\n\n// Định dạng ngày YYYY-MM-DD\nconst formatDate = (d) => d.toISOString().split(\"T\")[0];\n\n// Trả ra một dòng duy nhất\nreturn [{\n  json: {\n    \"Từ ngày\": formatDate(monday),\n    \"Đến ngày\": formatDate(sunday),\n    \"Cao\": cao,\n    \"Trung bình\": trung,\n    \"Thấp\": thap,\n    \"Tổng\": tong\n  }\n}];\n"
+        "jsCode": "// Đếm số bài viết theo mức độ\nlet cao = 0, trung = 0, thap = 0;\n\nfor (const item of $input.all()) {\n  const muc = item.json[\"Mức_độ\"]?.split(\" \")[0]; // Lấy chữ đầu\n  if (muc === \"Cao\") cao++;\n  else if (muc === \"Trung\") trung++;\n  else if (muc === \"Thấp\") thap++;\n}\n\nconst tong = cao + trung + thap;\n\n// Lấy ngày hiện tại theo giờ Việt Nam (UTC+7)\nconst now = new Date();\nnow.setUTCHours(now.getUTCHours() + 7);\n\n// Tính ngày đầu tuần (thứ 2) và cuối tuần (chủ nhật)\nconst dayOfWeek = now.getDay(); // Chủ nhật = 0\nconst monday = new Date(now);\nmonday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));\nconst sunday = new Date(monday);\nsunday.setDate(monday.getDate() + 6);\n\n// Định dạng ngày YYYY-MM-DD\nconst formatDate = (d) => d.toISOString().split(\"T\")[0];\n\n// Trả ra một dòng duy nhất kèm ID (giả sử ID bắt đầu từ 1)\nreturn [{\n  json: {\n    \"ID\": 1,\n    \"Từ ngày\": formatDate(monday),\n    \"Đến ngày\": formatDate(sunday),\n    \"Cao\": cao,\n    \"Trung bình\": trung,\n    \"Thấp\": thap,\n    \"Tổng\": tong\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -472,8 +488,8 @@
       "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
       "credentials": {
         "smtp": {
-          "id": "ykRTZzpRksIGSFK2",
-          "name": "SMTP account 3"
+          "id": "u9TNW1SRBYGnm2Wa",
+          "name": "SMTP account 2"
         }
       }
     },
@@ -497,6 +513,125 @@
       "id": "2fc892cd-bec8-4f1f-a941-0d3c10a6921e",
       "name": "Tách danh sách bài viết",
       "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk",
+          "mode": "list",
+          "cachedResultName": "Bao_Cao_Tuan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "BaoCaoID": "={{ $json.ID }}",
+            "TuNgay": "={{ $json['Từ ngày'] }}",
+            "DenNgay": "={{ $json['Đến ngày'] }}",
+            "SoLuongCao": "={{ $json.Cao }}",
+            "SoLuongTrungBinh": "={{ $json['Trung bình'] }}",
+            "SoLuongThap": "={{ $json['Thấp'] }}",
+            "TongSoLuong": "={{ $json['Tổng'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TuNgay",
+              "displayName": "TuNgay",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DenNgay",
+              "displayName": "DenNgay",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SoLuongCao",
+              "displayName": "SoLuongCao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SoLuongTrungBinh",
+              "displayName": "SoLuongTrungBinh",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SoLuongThap",
+              "displayName": "SoLuongThap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TongSoLuong",
+              "displayName": "TongSoLuong",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BaoCaoID",
+              "displayName": "BaoCaoID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [200, 140],
+      "id": "02302db7-8c05-4fe0-aec6-5327e653ae2e",
+      "name": "Ghi kết quả báo cáo tuần",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
     }
   ],
   "connections": {
@@ -669,6 +804,11 @@
         [
           {
             "node": "Gửi Email cảnh báo hằng tuần",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ghi kết quả báo cáo tuần",
             "type": "main",
             "index": 0
           }
