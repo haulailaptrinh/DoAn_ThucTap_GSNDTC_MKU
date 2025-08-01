@@ -55,7 +55,7 @@
           "__rl": true,
           "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
           "mode": "list",
-          "cachedResultName": "Canh_Bao",
+          "cachedResultName": "BaiViet",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -69,10 +69,10 @@
           "mappingMode": "defineBelow",
           "value": {
             "TieuDe": "={{ $json.TieuDe }}",
-            "Link": "={{ $json.Link }}",
             "NoiDung": "={{ $json.NoiDung }}",
             "TuKhoa": "={{ $json.TuKhoa }}",
-            "NgayPhatHien": "={{ $json.NgayPhatHien }}"
+            "NgayPhatHien": "={{ $json.NgayPhatHien }}",
+            "LinkBaiViet": "={{ $json.Link }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -86,13 +86,14 @@
               "canBeUsedToMatch": true
             },
             {
-              "id": "Link",
-              "displayName": "Link",
+              "id": "LinkBaiViet",
+              "displayName": "LinkBaiViet",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "NoiDung",
@@ -141,37 +142,6 @@
     },
     {
       "parameters": {
-        "authentication": "serviceAccount",
-        "documentId": {
-          "__rl": true,
-          "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
-          "mode": "list",
-          "cachedResultName": "Canh_Bao",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit#gid=0"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4,
-      "position": [-520, 800],
-      "name": "Đọc file Sheets để kiểm tra trùng",
-      "id": "282d8a48-ee0c-48a9-8948-df7fbb4de044",
-      "credentials": {
-        "googleApi": {
-          "id": "bDfKP49GQmA772n5",
-          "name": "API Sheets"
-        }
-      }
-    },
-    {
-      "parameters": {
         "promptType": "define",
         "text": "=Bài viết có tiêu đề \"{{ $json.TieuDe }}\" phản ánh nội dung: {{ $json.NoiDung }}. Nội dung chủ yếu đề cập đến [tóm tắt ngắn gọn vấn đề tiêu cực, ví dụ: chất lượng dịch vụ kém, sai phạm trong quản lý, thái độ nhân viên, sự cố an toàn...].\n\nHướng xử lý:\n\nXác minh thông tin: Liên hệ trực tiếp với tác giả bài viết (nếu có thể) hoặc bộ phận liên quan để thu thập dữ kiện chính xác.\n\nCông khai phản hồi: Đưa ra thông báo chính thức trên kênh truyền thông của tổ chức, ghi nhận phản ánh và cam kết giải quyết (nếu có sai sót).\n\nGiải quyết nội bộ: Rà soát quy trình, đào tạo lại nhân sự hoặc khắc phục sự cố (nếu vấn đề thuộc trách nhiệm của tổ chức).\n\nTheo dõi phản ứng cộng đồng: Đánh giá mức độ lan truyền và điều chỉnh chiến lược truyền thông phù hợp.\n\nChủ động ngăn chặn khủng hoảng mở rộng: Chuẩn bị kịch bản ứng phó nếu bài viết được chia sẻ rộng hoặc bị báo chí đưa tin.\n\nMức độ ảnh hưởng:\n\nThấp: Nếu bài viết có ít tương tác (dưới 100 lượt chia sẻ/like), nội dung chỉ là ý kiến cá nhân, không dẫn chứng cụ thể hoặc không liên quan trực tiếp đến thương hiệu (ví dụ: bài viết tiêu cực về một cá nhân không thuộc tổ chức).\n\nTrung bình: Nếu bài viết có bằng chứng hình ảnh/video, được chia sẻ trong cộng đồng mục tiêu (ví dụ: nhóm khách hàng, phụ huynh học sinh), hoặc gây tranh cãi với 100–1.000 lượt tương tác.\n\nCao: Nếu nội dung liên quan đến sai phạm pháp lý, an toàn tính mạng, tố cáo có hệ thống, hoặc lan truyền mạnh (trên 1.000 lượt chia sẻ, xuất hiện trên báo chí).\n\nDự đoán nguồn bài viết:\n\nMạng xã hội (Facebook/TikTok): Nếu bài viết có ngôn ngữ đời thường, dùng hashtag, đăng trong nhóm kín hoặc kèm video ngắn.\n\nDiễn đàn/Website: Nếu có cấu trúc bài bản, dẫn nguồn dữ liệu hoặc đăng trên trang có tên miền riêng.\n\nBáo chí: Nếu bài viết có văn phong chính thống, dẫn lời chuyên gia hoặc đại diện tổ chức.\n\nCần xác minh thêm: Nếu không rõ nguồn hoặc thiếu thông tin ngữ cảnh.\n\nLưu ý:\n\nNếu bài viết không liên quan đến Trường Cửu Long, mức độ ảnh hưởng có thể xếp Thấp (trừ khi nội dung gián tiếp gây hiểu lầm về thương hiệu).\n\nLuôn đặt tính trung lập lên hàng đầu: Tránh dùng từ ngữ đổ lỗi (ví dụ: \"bài viết cố tình bôi xấu\") thay bằng \"cần kiểm chứng thông tin\".",
         "options": {
@@ -186,11 +156,11 @@
     },
     {
       "parameters": {
-        "jsCode": "const now = new Date();\n\nconst format = (n) => String(n).padStart(2, '0');\n\nconst formattedNow = `${now.getFullYear()}-${format(now.getMonth() + 1)}-${format(now.getDate())} ${format(now.getHours())}:${format(now.getMinutes())}:${format(now.getSeconds())}`;\n\nconst ketQua = [];\n\nconst isEmpty = (val) => !val || val.trim() === '';\n\nconst extract = (text, label) => {\n  const regex = new RegExp(`${label}\\\\s*([\\\\s\\\\S]*?)(?=\\\\n\\\\n|$)`, 'i');\n  const match = text.match(regex);\n  return match ? match[1].trim() : '';\n};\n\nlet id = 14; // 👉 Bắt đầu từ ID 14\n\nfor (const item of items) {\n  const data = item.json;\n\n  const allFields = [data.tieuDe, data.noiDung, data.huongXuLy, data.mucDoAnhHuong, data.output];\n  if (allFields.every(isEmpty)) continue;\n\n  let tieuDe = data.tieuDe?.trim() || '';\n  let noiDung = data.noiDung?.trim() || '';\n  let huongXuLy = data.huongXuLy?.trim() || '';\n  let mucDoAnhHuong = data.mucDoAnhHuong?.trim() || '';\n  let nguonBaiViet = data.nguonBaiViet?.trim() || 'Cần xác minh thêm';\n\n  if (!isEmpty(data.output)) {\n    const out = data.output.trim();\n    tieuDe = extract(out, 'Tóm tắt:') || tieuDe;\n    noiDung = extract(out, 'Tóm tắt:') || noiDung;\n    huongXuLy = extract(out, 'Hướng xử lý:') || huongXuLy;\n    mucDoAnhHuong = extract(out, 'Mức độ ảnh hưởng:') || mucDoAnhHuong;\n    nguonBaiViet = extract(out, 'Dự đoán nguồn bài viết:') || nguonBaiViet;\n  }\n\n  if ([tieuDe, noiDung, huongXuLy, mucDoAnhHuong].every(isEmpty)) continue;\n\n  ketQua.push({\n    json: {\n      id: id++, // 👉 Gán và tăng id\n      tieuDe: tieuDe.slice(0, 100),\n      noiDung,\n      huongXuLy,\n      mucDoAnhHuong,\n      nguonBaiViet,\n      ngayPhatHien: formattedNow\n    }\n  });\n}\n\nreturn ketQua;\n"
+        "jsCode": "const now = new Date();\n\nconst format = (n) => String(n).padStart(2, '0');\n\nconst formattedNow = `${now.getFullYear()}-${format(now.getMonth() + 1)}-${format(now.getDate())} ${format(now.getHours())}:${format(now.getMinutes())}:${format(now.getSeconds())}`;\n\n\n\n\nconst ketQua = [];\n\n// 👉 Hàm kiểm tra chuỗi trống\nconst isEmpty = (val) => !val || val.trim() === '';\n\n// 👉 Hàm trích nội dung từ output theo tiêu đề phần\nconst extract = (text, label) => {\n  const regex = new RegExp(`${label}\\\\s*([\\\\s\\\\S]*?)(?=\\\\n\\\\n|$)`, 'i');\n  const match = text.match(regex);\n  return match ? match[1].trim() : '';\n};\n\nfor (const item of items) {\n  const data = item.json;\n\n  // 👉 Bỏ qua nếu tất cả các trường đều trống\n  const allFields = [data.tieuDe, data.noiDung, data.huongXuLy, data.mucDoAnhHuong, data.output];\n  if (allFields.every(isEmpty)) continue;\n\n  // 👉 Lấy dữ liệu gốc\n  let tieuDe = data.tieuDe?.trim() || '';\n  let noiDung = data.noiDung?.trim() || '';\n  let huongXuLy = data.huongXuLy?.trim() || '';\n  let mucDoAnhHuong = data.mucDoAnhHuong?.trim() || '';\n  let nguonBaiViet = data.nguonBaiViet?.trim() || 'Cần xác minh thêm';\n\n  // 👉 Ghi đè nếu có output\n  if (!isEmpty(data.output)) {\n    const out = data.output.trim();\n    tieuDe = extract(out, 'Tóm tắt:') || tieuDe;\n    noiDung = extract(out, 'Tóm tắt:') || noiDung;\n    huongXuLy = extract(out, 'Hướng xử lý:') || huongXuLy;\n    mucDoAnhHuong = extract(out, 'Mức độ ảnh hưởng:') || mucDoAnhHuong;\n    nguonBaiViet = extract(out, 'Dự đoán nguồn bài viết:') || nguonBaiViet;\n  }\n\n  // 👉 Nếu vẫn rỗng thì bỏ qua\n  if ([tieuDe, noiDung, huongXuLy, mucDoAnhHuong].every(isEmpty)) continue;\n\n  // 👉 Đưa vào kết quả\n  ketQua.push({\n    json: {\n      tieuDe: tieuDe.slice(0, 100),\n      noiDung,\n      huongXuLy,\n      mucDoAnhHuong,\n      nguonBaiViet,\n      ngayPhatHien: formattedNow\n    }\n  });\n}\n\n// 👉 Trả về danh sách các bài hợp lệ (hoặc [] nếu không có gì)\nreturn ketQua;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-260, 1000],
+      "position": [-280, 1040],
       "id": "6295f581-5777-45c8-87e1-b86386d29003",
       "name": "Xử lý kết quả từ AI",
       "alwaysOutputData": true
@@ -203,7 +173,7 @@
           "__rl": true,
           "value": "1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU",
           "mode": "list",
-          "cachedResultName": "Xu_Ly_Bai_Viet",
+          "cachedResultName": "ThongTinPhatHien",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C8ttq-03f0qsvvZCY5TdXdkB5p2Y5a7PdGq1gGssBVU/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -216,13 +186,12 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "XuLyID": "={{ $json.id }}",
             "TieuDe": "={{ $json.tieuDe }}",
             "NoiDungTomTat": "={{ $json.noiDung }}",
             "HuongXuLy": "={{ $json.huongXuLy }}",
             "MucDoAnhHuong": "={{ $json.mucDoAnhHuong }}",
             "NgayPhatHien": "={{ $json.ngayPhatHien }}",
-            "LienKet": "={{ $('Ghi bài viết vào Sheets').item.json.Link }}"
+            "LinkBaiViet": "={{ $('Ghi bài viết vào Sheets').item.json.LinkBaiViet }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -233,8 +202,7 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
               "id": "NoiDungTomTat",
@@ -243,8 +211,7 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
               "id": "HuongXuLy",
@@ -253,8 +220,7 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
               "id": "MucDoAnhHuong",
@@ -263,18 +229,16 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
-              "id": "LienKet",
-              "displayName": "LienKet",
+              "id": "LinkBaiViet",
+              "displayName": "LinkBaiViet",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
               "id": "NgayPhatHien",
@@ -283,12 +247,11 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
-              "id": "XuLyID",
-              "displayName": "XuLyID",
+              "id": "PhatHieID",
+              "displayName": "PhatHieID",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -522,7 +485,7 @@
           "__rl": true,
           "value": "1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk",
           "mode": "list",
-          "cachedResultName": "Bao_Cao_Tuan",
+          "cachedResultName": "ThongKeBaoCaoTuan",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DFXnI8dJJH4X1Hy9aOlVsq5KAMI62Qfow0XmG5FWtxk/edit?usp=drivesdk"
         },
         "sheetName": {
@@ -632,6 +595,37 @@
           "name": "API Sheets"
         }
       }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU",
+          "mode": "list",
+          "cachedResultName": "BaiViet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bVSPnFZ-0XW9VZ74TzBVHJxMn0sT61lYolF2XKzAyTU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [-520, 800],
+      "name": "Đọc file sheets BaiViet",
+      "id": "282d8a48-ee0c-48a9-8948-df7fbb4de044",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
     }
   ],
   "connections": {
@@ -666,7 +660,7 @@
             "index": 0
           },
           {
-            "node": "Đọc file Sheets để kiểm tra trùng",
+            "node": "Đọc file sheets BaiViet",
             "type": "main",
             "index": 0
           }
@@ -691,17 +685,6 @@
             "node": "Gửi bài cho AI phân tích tiêu cực",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Đọc file Sheets để kiểm tra trùng": {
-      "main": [
-        [
-          {
-            "node": "Gộp bài viết mới với dữ liệu cũ",
-            "type": "main",
-            "index": 1
           }
         ]
       ]
@@ -833,6 +816,17 @@
             "node": "Lọc bài viết tiêu cực",
             "type": "main",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Đọc file sheets BaiViet": {
+      "main": [
+        [
+          {
+            "node": "Gộp bài viết mới với dữ liệu cũ",
+            "type": "main",
+            "index": 1
           }
         ]
       ]
