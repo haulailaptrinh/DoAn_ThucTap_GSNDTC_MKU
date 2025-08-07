@@ -1,4 +1,5 @@
 {
+  "name": "DoAn_TTTN_MKU",
   "nodes": [
     {
       "parameters": {
@@ -12,8 +13,8 @@
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "yUfnPS2l6t7sUftv",
-          "name": "API Gemini"
+          "id": "jyELhF1oXnfd05jO",
+          "name": "API Gemini 2"
         }
       }
     },
@@ -282,7 +283,7 @@
         "toEmail": "haulailaptrinh@gmail.com",
         "subject": "Báo cáo giám sát hàng ngày - ĐH Cửu Long",
         "emailFormat": "html",
-        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      background-color: #f1f1f1;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 20px;\n      max-width: 700px;\n      margin: auto;\n      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    }\n    h2 {\n      color: #b00020;\n      font-size: 20px;\n    }\n    .section {\n      margin-bottom: 16px;\n    }\n    .label {\n      font-weight: bold;\n      color: #555;\n    }\n    .value {\n      margin-top: 4px;\n      white-space: pre-line;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2>📢 {{ $json.tieuDe}}</h2>\n\n    <div class=\"section\">\n      <div class=\"label\">📅 Ngày phát hiện:</div>\n      <div class=\"value\">{{ $json.ngayPhatHien}}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">📌 Tóm tắt nội dung:</div>\n      <div class=\"value\">{{ $json.noiDung }}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">🛠 Hướng xử lý:</div>\n      <div class=\"value\">{{ $json.huongXuLy }}</div>\n    </div>\n\n    {{ $json.mucDoAnhHuong ? `\n    <div class=\"section\">\n      <div class=\"label\">⚠️ Mức độ ảnh hưởng:</div>\n      <div class=\"value\">${$json.mucDoAnhHuong}</div>\n    </div>` : '' }}\n\n    <div class=\"section\">\n      <div class=\"label\">🌐 Nguồn gốc bài viết:</div>\n      <div class=\"value\">{{ $('Ghi bài viết vào Sheets').item.json.Link}}</div>\n    </div>\n\n    {{ $json.lienKet ? `\n    <div class=\"section\">\n      <div class=\"label\">🔗 Đường dẫn:</div>\n      <div class=\"value\"><a href=\"${$json.lienKet}\" target=\"_blank\">${$json.lienKet}</a></div>\n    </div>` : '' }}\n  </div>\n</body>\n</html>\n",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      background-color: #f1f1f1;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 20px;\n      max-width: 700px;\n      margin: auto;\n      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    }\n    h2 {\n      color: #b00020;\n      font-size: 20px;\n    }\n    .section {\n      margin-bottom: 16px;\n    }\n    .label {\n      font-weight: bold;\n      color: #555;\n    }\n    .value {\n      margin-top: 4px;\n      white-space: pre-line;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2>📢 {{ $json.tieuDe}}</h2>\n\n    <div class=\"section\">\n      <div class=\"label\">📅 Ngày phát hiện:</div>\n      <div class=\"value\">{{ $json.ngayPhatHien}}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">📌 Tóm tắt nội dung:</div>\n      <div class=\"value\">{{ $json.noiDung }}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">🛠 Hướng xử lý:</div>\n      <div class=\"value\">{{ $json.huongXuLy }}</div>\n    </div>\n\n    {{ $json.mucDoAnhHuong ? `\n    <div class=\"section\">\n      <div class=\"label\">⚠️ Mức độ ảnh hưởng:</div>\n      <div class=\"value\">${$json.mucDoAnhHuong}</div>\n    </div>` : '' }}\n\n    <div class=\"section\">\n      <div class=\"label\">🌐 Nguồn gốc bài viết:</div>\n      <div class=\"value\">{{ $('Ghi bài viết vào Sheets').item.json.LinkBaiViet }}</div>\n    </div>\n\n    {{ $json.lienKet ? `\n    <div class=\"section\">\n      <div class=\"label\">🔗 Đường dẫn:</div>\n      <div class=\"value\"><a href=\"${$json.lienKet}\" target=\"_blank\">${$json.lienKet}</a></div>\n    </div>` : '' }}\n  </div>\n</body>\n</html>\n",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
@@ -356,7 +357,7 @@
           "interval": [
             {
               "field": "hours",
-              "hoursInterval": 8
+              "hoursInterval": 12
             }
           ]
         }
@@ -416,7 +417,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Sắp xếp bài viết theo mức độ ưu tiên: Cao > Trung > Thấp\nconst uuTien = { \"Cao\": 3, \"Trung\": 2, \"Thấp\": 1 };\n\n// Lấy toàn bộ dữ liệu đầu vào và xử lý\nconst ketQua = $input.all()\n  .sort((a, b) => {\n    const aMuc = a.json[\"Mức độ ảnh hưởng\"]?.split(\" \")[0] || \"\";\n    const bMuc = b.json[\"Mức độ ảnh hưởng\"]?.split(\" \")[0] || \"\";\n    return (uuTien[bMuc] || 0) - (uuTien[aMuc] || 0);\n  })\n  .map((item, index) => ({\n    json: {\n      STT: index + 1,\n      Tiêu_đề: item.json[\"TieuDe\"] || \"Không rõ\",\n      Nội_dung: item.json[\"NoiDungTomTat\"] || \"Không rõ\",\n      Hướng_xử_lý: item.json[\"HuongXuLy\"] || \"Không rõ\",\n      Mức_độ: item.json[\"MucDoAnhHuong\"] || \"Không rõ\",\n      Liên_kết: item.json[\"LienKet\"] || \"Không rõ\",\n      Ngày_phát_hiện: item.json[\"NgayPhatHien\"] || \"Không rõ\"\n    }\n  }));\n\nreturn ketQua;\n"
+        "jsCode": "// Sắp xếp bài viết theo mức độ ưu tiên: Cao > Trung > Thấp\nconst uuTien = { \"Cao\": 3, \"Trung\": 2, \"Thấp\": 1 };\n\n// Hàm chuẩn hóa mức độ ảnh hưởng\nfunction chuanHoaMucDo(text) {\n  const muc = text?.split(\" \")[0] || \"\";\n  if (text?.startsWith(\"Cần xác minh thêm\")) return \"Thấp\";\n  return muc;\n}\n\n// Lấy toàn bộ dữ liệu đầu vào và xử lý\nconst ketQua = $input.all()\n  .sort((a, b) => {\n    const aMuc = chuanHoaMucDo(a.json[\"Mức độ ảnh hưởng\"]);\n    const bMuc = chuanHoaMucDo(b.json[\"Mức độ ảnh hưởng\"]);\n    return (uuTien[bMuc] || 0) - (uuTien[aMuc] || 0);\n  })\n  .map((item, index) => ({\n    json: {\n      STT: index + 1,\n      Tiêu_đề: item.json[\"TieuDe\"] || \"Không rõ\",\n      Nội_dung: item.json[\"NoiDungTomTat\"] || \"Không rõ\",\n      Hướng_xử_lý: item.json[\"HuongXuLy\"] || \"Không rõ\",\n      Mức_độ: item.json[\"MucDoAnhHuong\"] || \"Không rõ\",\n      Liên_kết: item.json[\"LienKet\"] || \"Không rõ\",\n      Ngày_phát_hiện: item.json[\"NgayPhatHien\"] || \"Không rõ\"\n    }\n  }));\n\nreturn ketQua;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -458,7 +459,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [\n  {\n    json: {\n      url: 'https://www.googleapis.com/customsearch/v1' +\n        '?key=AIzaSyBq5FP4LyvWBz6cewIngXfI901H6hBTsIQ' +\n        '&cx=1030afc45228a4135' +\n        '&q=(' +\n          '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"ĐHCL\" OR \"Trường Cửu Long\" OR \"Trường Đại học Cửu Long\" OR \"Cửu Long University\" OR \"Truong Dai Hoc Cuu Long\"' +\n        ') ' +\n        '(' +\n          '\"lừa đảo\" OR \"gian lận\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"dối trá\" OR ' +\n          '\"bóc phốt\" OR \"mập mờ\" OR \"thiếu minh bạch\" OR \"giả mạo\" OR \"mất uy tín\" OR ' +\n          '\"hạ chuẩn\" OR \"tẩy chay\" OR \"bị tố\" OR \"bê bối\" OR \"đình chỉ\" OR \"chất lượng kém\" OR ' +\n          '\"phản ánh tiêu cực\" OR \"tranh cãi\" OR \"gian dối\" OR \"bất công\" OR \"hứa suông\" OR ' +\n          '\"làm tiền\" OR \"đa cấp\" OR \"có dấu hiệu sai phạm\"' +\n        ') ' +\n        // Gợi ý ngữ cảnh giáo dục\n        '(\"tuyển sinh\" OR \"giảng viên\" OR \"đào tạo\" OR \"sinh viên\" OR \"bằng cấp\") ' +\n        // Từ khóa loại trừ\n        '-\"cá cược\" -\"nhà cái\" -\"soi kèo\" -\"bóng đá\" -\"casino\" -\"xổ số\" -\"lô đề\" -\"đánh bạc\" -\"tiền ảo\" ' +\n        'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n        '&sort=date' +\n        '&lr=lang_vi' +\n        '&gl=vn'\n    }\n  }\n];\n"
+        "jsCode": "return [\n  {\n    json: {\n      url: 'https://www.googleapis.com/customsearch/v1' +\n        '?key=AIzaSyA339ZLse5pPWgGMX0tDlJXsmu2TX1bt0w' +\n        '&cx=37a5edc77da3c4fc9' +\n        '&num=5' + // 🔻 chỉ lấy 5 kết quả\n        '&q=(' +\n          '\"Đại học Cửu Long\" OR \"ĐH Cửu Long\" OR \"Trường Cửu Long\" OR \"Cửu Long University\"' +\n        ') ' +\n        '(' +\n          '\"lừa đảo\" OR \"phốt\" OR \"scam\" OR \"chiếm đoạt\" OR \"bê bối\" OR \"thiếu minh bạch\"' +\n        ') ' +\n        '(' +\n          '\"tuyển sinh\" OR \"giảng viên\" OR \"giáo dục\" OR \"đào tạo\" OR \"sinh viên\" OR \"bằng cấp\"' +\n        ') ' +\n        // Loại bỏ các kết quả không liên quan đến giáo dục\n        '-\"cá cược\" -\"nhà cái\" -\"soi kèo\" -\"bóng đá\" -\"casino\" -\"xổ số\" -\"lô đề\" -\"đánh bạc\" -\"tiền ảo\" ' +\n        // Giới hạn nguồn báo uy tín\n        'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:zingnews.vn OR site:laodong.vn OR site:dantri.com.vn OR site:vietnamnet.vn' +\n        '&sort=date' + // sắp xếp theo ngày\n        '&lr=lang_vi' + // ưu tiên tiếng Việt\n        '&gl=vn'\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -628,6 +629,7 @@
       }
     }
   ],
+  "pinData": {},
   "connections": {
     "Google Gemini Chat Model": {
       "ai_languageModel": [
@@ -832,9 +834,15 @@
       ]
     }
   },
-  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f5c3e436-bc59-426b-ace4-fdbb93568a8e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "dc11cb4891443fae026bd649ce2af9b7a75f9d81700ccc3935ac1d32053faa0e"
-  }
+  },
+  "id": "ADrnZcD3GkAquBvz",
+  "tags": []
 }
