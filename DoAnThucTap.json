@@ -1,0 +1,902 @@
+{
+  "name": "DoAnThucTap",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -360,
+        140
+      ],
+      "id": "18db2fdc-3943-4d35-9d0e-d98c2edb295f",
+      "name": "Tập lịch chạy"
+    },
+    {
+      "parameters": {
+        "jsCode": "// API KEYS\nconst apiKey = \"AIzaSyAQQ_GV3xzsZH5Bhki2n-M1_2XvrkWOvKI\";\nconst cxID = \"97e47ea83d8d74ae5\";\n\n// Các nhóm từ khóa\nconst tuKhoaChinh = '\"Đại học Cửu Long\" OR \"MKU\" OR \"DHCL\"';\nconst tuKhoaTieuCuc = '\"lừa đảo\" OR \"gian lận\" OR \"chiếm đoạt\" OR \"thiếu minh bạch\" OR \"phốt\" OR \"từ ngữ đã kích\" OR \"mất uy tín\" OR \"chất lượng kém\"';\nconst tuKhoaLinhVuc = '\"tuyển sinh\" OR \"giảng viên\" OR \"giáo dục\" OR \"đào tạo\" OR \"sinh viên\" OR \"bằng cấp\"';\nconst site = 'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:vietnamnet.vn';\n\n// Ghép query\nconst query = `(${tuKhoaChinh}) (${tuKhoaTieuCuc}) (${tuKhoaLinhVuc}) (${site})`;\n\n// Tạo URL (có encodeURIComponent)\nconst url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cxID}&num=10&q=${query}&sort=date&lr=lang_vi&gl=vn`;\n\n// Trả về kết quả\nreturn [{ json: { url } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        140
+      ],
+      "id": "164c8f54-de25-443d-9219-e1376143f0d3",
+      "name": "Tạo danh sách URL"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        140
+      ],
+      "id": "48ba51a7-3c54-4bed-8696-d183793da6c3",
+      "name": "Gửi request tìm bài viết"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ketQuaTong = [];\n\nfor (const input of items) {\n  const danhSach = input.json.items || [];\n  for (const kq of danhSach) {\n    ketQuaTong.push({\n      json: {\n        tieuDe: kq.title || '',   \n        link: kq.link || '',      \n        noiDung: kq.snippet || ''\n      }\n    });\n  }\n}\nreturn ketQuaTong;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        140
+      ],
+      "id": "f4d89eb3-e742-44d3-9871-db13ac1735a1",
+      "name": "Tách danh sách bài viết"
+    },
+    {
+      "parameters": {
+        "jsCode": "const Truong = [\"đại học cửu long\" , \"mku\" , \"dhcl\"];\nconst tuKhoaTieuCuc = [\"lừa đảo\" , \"gian lận\" , \"chiếm đoạt\" , \"thiếu minh bạch\" , \"phốt\" , \"từ ngữ đã kích\" , \"mất uy tín\" , \"chất lượng kém\"];\n\n// Lấy thời gian ở VN\nconst thoiGian = new Date().toLocaleString(\"vi-VN\", {\n  timeZone: \"Asia/Ho_Chi_Minh\",\n  hour12: false\n});\n\n// Hàm kiểm tra có chứa từ khóa\nconst coChua = (text, dsTuKhoa) => {\n  return dsTuKhoa.some(tu => text.includes(tu));\n};\n\nconst ketQua = items\n  .map(item => {\n    const tieuDe = (item.json.tieuDe || \"\").toLowerCase();\n    const noiDung = (item.json.noiDung || \"\").toLowerCase();\n    const vanBan = tieuDe + \" \" + noiDung;\n\n    if (coChua(vanBan, Truong) && coChua(vanBan, tuKhoaTieuCuc)) {\n      const tuKhoaTimThay = tuKhoaTieuCuc.filter(tu => vanBan.includes(tu));\n      return {\n        json: {\n          TieuDe: item.json.tieuDe,\n          Link: item.json.link,\n          NoiDung: item.json.noiDung,\n          TuKhoa: tuKhoaTimThay.join(\", \"),\n          NgayPhatHien: thoiGian\n        }\n      };\n    }\n    return null;\n  })\n  .filter(Boolean);\n\nreturn ketQua;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        360
+      ],
+      "id": "b6e02ec8-944d-48d5-a34b-f104d94cdf46",
+      "name": "Lọc bài viết tiêu cực",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1ObrhIGTGgUZrMRs1DTT88JvvVNttnW7D2A04SOIjwwo",
+          "mode": "list",
+          "cachedResultName": "Bai_Viet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ObrhIGTGgUZrMRs1DTT88JvvVNttnW7D2A04SOIjwwo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ObrhIGTGgUZrMRs1DTT88JvvVNttnW7D2A04SOIjwwo/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -120,
+        460
+      ],
+      "id": "d4e72ffc-fe90-4530-aa0b-4bc00150e076",
+      "name": "Đọc file Sheets BaiViet",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        100,
+        380
+      ],
+      "id": "518f64e5-e10c-40c0-adb9-a3b4f7cb6b85",
+      "name": "Gộp bài viết mới với dữ liệu cũ"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst oldArticles = items.filter(i => i.json.row_number);\nconst newArticles = items.filter(i => !i.json.row_number);\n\n\nconst oldList = oldArticles.map(a => ({\n  title: (a.json.TieuDe || \"\").trim().toLowerCase(),\n  content: (a.json.NoiDung || \"\").substring(0,100).trim().toLowerCase(),\n  link: (a.json.Link || \"\").trim().toLowerCase()\n}));\n\n\nconst uniqueArticles = newArticles.filter(a => {\n  const title = (a.json.TieuDe || \"\").trim().toLowerCase();\n  const content = (a.json.NoiDung || \"\").substring(0,100).trim().toLowerCase();\n  const link = (a.json.Link || \"\").trim().toLowerCase();\n\n  return !oldList.some(o =>\n    o.title === title ||\n    o.content === content ||\n    o.link === link\n  );\n});\n\nreturn uniqueArticles;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        380
+      ],
+      "id": "ea2e614a-d430-4c8a-8d64-29d02e2430fd",
+      "name": "Kiểm tra bai viết trùng",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ObrhIGTGgUZrMRs1DTT88JvvVNttnW7D2A04SOIjwwo",
+          "mode": "list",
+          "cachedResultName": "Bai_Viet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ObrhIGTGgUZrMRs1DTT88JvvVNttnW7D2A04SOIjwwo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ObrhIGTGgUZrMRs1DTT88JvvVNttnW7D2A04SOIjwwo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TieuDe": "={{ $json.TieuDe }}",
+            "LinkBaiViet": "={{ $json.Link }}",
+            "NoiDung": "={{ $json.NoiDung }}",
+            "TuKhoa": "={{ $json.TuKhoa }}",
+            "NgayPhatHien": "={{ $json.NgayPhatHien }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TieuDe",
+              "displayName": "TieuDe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkBaiViet",
+              "displayName": "LinkBaiViet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NoiDung",
+              "displayName": "NoiDung",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TuKhoa",
+              "displayName": "TuKhoa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NgayPhatHien",
+              "displayName": "NgayPhatHien",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -340,
+        680
+      ],
+      "id": "3c9471cb-ab41-46db-a88d-da67ae35dcd3",
+      "name": "Ghi bài viết vào  Sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Báo cáo phát hiện bài viết tiêu cực\n\nThời gian phát hiện: {{ $json.NgayPhatHien }}\nLink bài viết: {{ $json.LinkBaiViet }}\nTiêu đề: {{ $json.TieuDe }}\nNội dung phản ánh:{{ $json.NoiDung }}\n\nTóm tắt vấn đề tiêu cực:\n[Ví dụ: chất lượng dịch vụ kém, sai phạm trong quản lý, thái độ nhân viên, sự cố an toàn…]\n\nHướng xử lý đề xuất\n\nXác minh thông tin: Liên hệ tác giả (nếu có) hoặc bộ phận liên quan để thu thập dữ liệu.\n\nCông khai phản hồi: Thông báo chính thức, ghi nhận phản ánh và cam kết khắc phục.\n\nGiải quyết nội bộ: Rà soát quy trình, đào tạo lại nhân sự, xử lý sự cố.\n\nTheo dõi phản ứng cộng đồng: Đánh giá mức độ lan truyền, điều chỉnh chiến lược truyền thông.\n\nNgăn chặn khủng hoảng: Chuẩn bị kịch bản ứng phó nếu lan truyền mạnh hoặc báo chí đưa tin.\n\nMức độ ảnh hưởng\n\nThấp: < 100 tương tác, ý kiến cá nhân, không liên quan trực tiếp, chưa lên báo chí.\n\nTrung bình: 100 – < 1.000 tương tác, có bằng chứng nhưng chưa nghiêm trọng, chia sẻ trong cộng đồng mục tiêu.\n\nCao: ≥ 1.000 tương tác hoặc xuất hiện trên báo chí lớn, liên quan pháp lý/an toàn, có bằng chứng mạnh.\n\nLưu ý\n\nNếu không liên quan trực tiếp đến Trường ĐH Cửu Long, xếp mức ảnh hưởng Thấp (trừ khi gây hiểu lầm thương hiệu).\n\nLuôn giữ trung lập, cần kiểm chứng thông tin thay vì kết luận vội.\n\nKhông quy chụp, tránh dùng cụm từ mang tính buộc tội.",
+        "options": {
+          "systemMessage": "=Bạn là một hệ thống giám sát và phân tích thông tin tiêu cực về một tổ chức/cá nhân. Nhiệm vụ của bạn là xử lý dữ liệu đầu vào, đánh giá mức độ ảnh hưởng, và đưa ra hướng xử lý chi tiết, dựa trên dữ liệu có sẵn.\n\nQuy tắc xử lý thông tin\n\nNếu bài viết tồn tại và có nội dung:\n\nTrích xuất các trường:\n\nTóm tắt: → mô tả ngắn gọn sự việc (1–2 câu). Nếu thông tin chưa đầy đủ → ghi \"Cần xác minh thêm về …\".\n\nHướng xử lý: → chi tiết từng bước xử lý thông tin tiêu cực.\n\nMức độ ảnh hưởng: → Thấp/Trung bình/Cao + lý do cụ thể.\n\nDự đoán nguồn bài viết: → nguồn xuất phát chính hoặc ghi \"Cần xác minh thêm\".\n\nHướng xử lý chi tiết khi phát hiện bài viết tiêu cực:\n\nXác minh thông tin với nguồn/bộ phận liên quan.\n\nLưu trữ dữ liệu gốc: link, ảnh, video.\n\nĐánh giá mức độ lan truyền: lượt chia sẻ, bình luận, độ phổ biến trên báo chí/mạng xã hội.\n\nChuẩn bị phản hồi nội bộ hoặc công khai nếu cần.\n\nTheo dõi sát tình hình trong 24–48 giờ.\n\nNẾU KHÔNG CÓ BÀI VIẾT TRẢ VỀ OUPUT LÀ TRỐNG\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -120,
+        680
+      ],
+      "id": "3e8ac2c2-2723-44a3-ad11-0263abd5a078",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        840
+      ],
+      "id": "15d7d870-c051-4318-959b-afd20eb04a0a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yUfnPS2l6t7sUftv",
+          "name": "API Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ketQua = [];\n\nconst isEmpty = (val) => !val || val.trim() === '';\n\nconst extract = (text, label) => {\n  const regex = new RegExp(`${label}\\\\s*([\\\\s\\\\S]*?)(?=\\\\n\\\\n|$)`, 'i');\n  const match = text.match(regex);\n  return match ? match[1].trim() : '';\n};\n\nfor (const item of items) {\n  const data = item.json;\n\n  const allFields = [\n    data.tieuDe,\n    data.noiDung,\n    data.huongXuLy,\n    data.mucDoAnhHuong,\n    data.output\n  ];\n\n  // Nếu tất cả các trường rỗng thì bỏ qua\n  if (allFields.every(isEmpty)) continue;\n\n  let tieuDe = data.tieuDe?.trim() || '';\n  let noiDung = data.noiDung?.trim() || '';\n  let huongXuLy = data.huongXuLy?.trim() || '';\n  let mucDoAnhHuong = data.mucDoAnhHuong?.trim() || '';\n  let nguonBaiViet = data.nguonBaiViet?.trim() || 'Cần xác minh thêm';\n\n  // Nếu output có dữ liệu thì trích xuất\n  if (!isEmpty(data.output)) {\n    const out = data.output.trim();\n    tieuDe = extract(out, 'Tóm tắt:') || tieuDe;\n    noiDung = extract(out, 'Tóm tắt:') || noiDung;\n    huongXuLy = extract(out, 'Hướng xử lý:') || huongXuLy;\n    mucDoAnhHuong = extract(out, 'Mức độ ảnh hưởng:') || mucDoAnhHuong;\n    nguonBaiViet = extract(out, 'Dự đoán nguồn bài viết:') || nguonBaiViet;\n  }\n\n  // Nếu tất cả các trường quan trọng đều rỗng thì bỏ qua\n  if ([tieuDe, noiDung, huongXuLy, mucDoAnhHuong].every(isEmpty)) continue;\n\n  ketQua.push({\n    json: {\n      tieuDe: tieuDe.slice(0, 100),\n      noiDung,\n      huongXuLy,\n      mucDoAnhHuong\n    }\n  });\n}\n\n// Trả về kết quả, có thể là mảng rỗng\nreturn ketQua;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        680
+      ],
+      "id": "019b96fb-b1cc-44f2-9df3-584a66f62cc9",
+      "name": "Xử lý kết quả AL",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1uB3XuYlUsluevP6zMtUBd9pZnpY6sF-df4eBGQQkz7A",
+          "mode": "list",
+          "cachedResultName": "Thong_Tin_Phat_Hien",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uB3XuYlUsluevP6zMtUBd9pZnpY6sF-df4eBGQQkz7A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uB3XuYlUsluevP6zMtUBd9pZnpY6sF-df4eBGQQkz7A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TieuDe": "={{ $json.tieuDe }}",
+            "NoiDungTomTat": "={{ $json.noiDung }}",
+            "HuongXuLy": "={{ $json.huongXuLy }}",
+            "MucDoAnhHuong": "={{ $json.mucDoAnhHuong }}",
+            "LinkBaiViet": "={{ $('Ghi bài viết vào  Sheets').item.json.LinkBaiViet }}",
+            "NgayPhatHien": "={{ $('Ghi bài viết vào  Sheets').item.json.NgayPhatHien }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TieuDe",
+              "displayName": "TieuDe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NoiDungTomTat",
+              "displayName": "NoiDungTomTat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HuongXuLy",
+              "displayName": "HuongXuLy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MucDoAnhHuong",
+              "displayName": "MucDoAnhHuong",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkBaiViet",
+              "displayName": "LinkBaiViet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NgayPhatHien",
+              "displayName": "NgayPhatHien",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PhatHieID",
+              "displayName": "PhatHieID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        680,
+        580
+      ],
+      "id": "a86c21f3-8fb4-4c8f-9252-66c0c282a99f",
+      "name": "Ghi kết quả xử lý vào sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bd0c5c39-1b95-4ae9-823e-9dfb8bdd3239",
+              "leftValue": "={{ $json.tieuDe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "fef2c729-e2f1-48f2-a09c-6e14104bc3a9",
+              "leftValue": "={{ $json.noiDung }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        680
+      ],
+      "id": "7d564adb-bd18-43b5-ac46-04929f146059",
+      "name": "Kiểm tra bài viết rỗng"
+    },
+    {
+      "parameters": {
+        "fromEmail": "haulailaptrinh@gmail.com",
+        "toEmail": "haulailaptrinh@gmail.com",
+        "subject": "Báo cáo giám sát hàng ngày - ĐH Cửu Long",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      background-color: #f1f1f1;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 20px;\n      max-width: 700px;\n      margin: auto;\n      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    }\n    h2 {\n      color: #b00020;\n      font-size: 20px;\n    }\n    .section {\n      margin-bottom: 16px;\n    }\n    .label {\n      font-weight: bold;\n      color: #555;\n    }\n    .value {\n      margin-top: 4px;\n      white-space: pre-line;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2> {{ $json.tieuDe}}</h2>\n\n    <div class=\"section\">\n      <div class=\"label\"> Ngày phát hiện:{{ $('Ghi bài viết vào  Sheets').item.json.NgayPhatHien }}</div>\n      <div class=\"value\"></div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">Tóm tắt nội dung:</div>\n      <div class=\"value\">{{ $json.noiDung }}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">Hướng xử lý:</div>\n      <div class=\"value\">{{ $json.huongXuLy }}</div>\n    </div>\n\n    {{ $json.mucDoAnhHuong ? `\n    <div class=\"section\">\n      <div class=\"label\"> Mức độ ảnh hưởng:</div>\n      <div class=\"value\">${$json.mucDoAnhHuong}</div>\n    </div>` : '' }}\n\n\n   {{$('Ghi bài viết vào  Sheets').item.json.LinkBaiViet ? `\n    <div class=\"section\">\n      <div class=\"label\"> Link bài viết:</div>\n      <div class=\"value\"></div>\n    </div>` : '' }}\n{{ $('Ghi bài viết vào  Sheets').item.json.LinkBaiViet }}\n\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        680,
+        760
+      ],
+      "id": "bf6a20cb-9155-44a9-8450-a73bc7ee2760",
+      "name": "Gửi Email cảnh báo hằng ngày",
+      "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
+      "credentials": {
+        "smtp": {
+          "id": "dZ2DwwWFlZQCBBwj",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -200
+      ],
+      "name": "Tập lịch chạy mỗi tuần",
+      "id": "f59bef16-d963-4bff-9ae8-db2ae96bb004"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1uB3XuYlUsluevP6zMtUBd9pZnpY6sF-df4eBGQQkz7A",
+          "mode": "list",
+          "cachedResultName": "Thong_Tin_Phat_Hien",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uB3XuYlUsluevP6zMtUBd9pZnpY6sF-df4eBGQQkz7A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uB3XuYlUsluevP6zMtUBd9pZnpY6sF-df4eBGQQkz7A/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -100,
+        -200
+      ],
+      "id": "c8480d99-df3a-4552-8f63-ac57cdd00c0a",
+      "name": "Đọc dữ liệu",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Bảng quy đổi mức độ ưu tiên\nconst uuTien = { \"Cao\": 3, \"Trung\": 2, \"Thấp\": 1 };\n\n// Hàm chuẩn hóa mức độ ảnh hưởng\nfunction chuanHoaMucDo(text) {\n  if (!text) return \"Thấp\"; // Mặc định là Thấp nếu không có\n  const muc = text.trim().split(\" \")[0];\n  if (text.startsWith(\"Cần xác minh thêm\")) return \"Thấp\";\n  return muc;\n}\n\n// Xử lý dữ liệu đầu vào\nconst ketQua = $input.all()\n  .map(item => {\n    const mucDo = chuanHoaMucDo(item.json[\"MucDoAnhHuong\"]);\n    return {\n      ...item.json,\n      MucDoAnhHuong: mucDo\n    };\n  })\n  .sort((a, b) => {\n    const aMuc = uuTien[a.MucDoAnhHuong] || 0;\n    const bMuc = uuTien[b.MucDoAnhHuong] || 0;\n    // Sắp xếp theo mức độ trước, sau đó theo ngày (mới nhất trước)\n    if (bMuc !== aMuc) return bMuc - aMuc;\n    return new Date(b.NgayPhatHien) - new Date(a.NgayPhatHien);\n  })\n  .map((item, index) => ({\n    json: {\n      STT: index + 1,\n      Tiêu_đề: item.TieuDe || \"Không rõ\",\n      Nội_dung: item.NoiDungTomTat || \"Không rõ\",\n      Hướng_xử_lý: item.HuongXuLy || \"Không rõ\",\n      Mức_độ: item.MucDoAnhHuong || \"Không rõ\",\n      Liên_kết: item.LienKet || \"Không rõ\",\n      Ngày_phát_hiện: item.NgayPhatHien || \"Không rõ\"\n    }\n  }));\n\nreturn ketQua;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -200
+      ],
+      "id": "1c2efa6b-1008-4440-a7d3-25788e09a8f0",
+      "name": "Xử lý mức độ"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Hàm chuẩn hóa mức độ\nfunction chuanHoaMucDo(text) {\n  if (!text) return null; // Không có dữ liệu thì bỏ qua\n  if (text.startsWith(\"Cần xác minh thêm\")) return null; // Loại bỏ\n  if (text.startsWith(\"Trung\")) return \"Trung bình\";\n  if (text.startsWith(\"Thấp\")) return \"Thấp\";\n  if (text.startsWith(\"Cao\")) return \"Cao\";\n  return null;\n}\n\n// Đếm số bài viết theo mức độ\nlet cao = 0, trung = 0, thap = 0;\n\nfor (const item of $input.all()) {\n  const muc = chuanHoaMucDo(item.json[\"Mức_độ\"]);\n  if (muc === \"Cao\") cao++;\n  else if (muc === \"Trung bình\") trung++;\n  else if (muc === \"Thấp\") thap++;\n}\n\nconst tong = cao + trung + thap;\n\n// Lấy ngày hiện tại theo giờ Việt Nam (UTC+7)\nconst now = new Date();\nnow.setUTCHours(now.getUTCHours() + 7);\n\n// Tính ngày đầu tuần (thứ 2) và cuối tuần (chủ nhật)\nconst dayOfWeek = now.getDay(); // Chủ nhật = 0\nconst monday = new Date(now);\nmonday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));\nconst sunday = new Date(monday);\nsunday.setDate(monday.getDate() + 6);\n\n// Định dạng ngày YYYY-MM-DD\nconst formatDate = (d) => d.toISOString().split(\"T\")[0];\n\n// Xuất dữ liệu thống kê\nreturn [{\n  json: {\n    \"ID\": 1,\n    \"Từ ngày\": formatDate(monday),\n    \"Đến ngày\": formatDate(sunday),\n    \"Cao\": cao,\n    \"Trung bình\": trung,\n    \"Thấp\": thap,\n    \"Tổng\": tong\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -200
+      ],
+      "id": "dc6a8d86-bcbe-4203-b00a-442c6abb82e8",
+      "name": "Tổng hợp theo tuần"
+    },
+    {
+      "parameters": {
+        "fromEmail": "haulailaptrinh@gmail.com",
+        "toEmail": "haulailaptrinh@gmail.com",
+        "subject": "Báo cáo giám sát hàng ngày - ĐH Cửu Long",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    table {\n      border-collapse: collapse;\n      width: 100%;\n      margin-top: 16px;\n    }\n    th, td {\n      border: 1px solid #ddd;\n      padding: 10px;\n      text-align: center;\n    }\n    th {\n      background-color: #f2f2f2;\n      font-weight: bold;\n    }\n    h2 {\n      color: #333;\n    }\n  </style>\n</head>\n<body>\n  <h2>Báo cáo nội dung tiêu cực theo tuần</h2>\n  <p>📅 Tuần từ <strong>{{ $json[\"Từ ngày\"] }}</strong> đến <strong>{{ $json[\"Đến ngày\"] }}</strong></p>\n\n  <table>\n    <tr>\n      <th>Mức độ</th>\n      <th>Số lượng</th>\n    </tr>\n    <tr>\n      <td style=\"color: red;\"><strong>Cao</strong></td>\n      <td>{{ $json[\"Cao\"] }}</td>\n    </tr>\n    <tr>\n      <td style=\"color: orange;\"><strong>Trung bình</strong></td>\n      <td>{{ $json[\"Trung bình\"] }}</td>\n    </tr>\n    <tr>\n      <td style=\"color: green;\"><strong>Thấp</strong></td>\n      <td>{{ $json[\"Thấp\"] }}</td>\n    </tr>\n    <tr>\n      <th>Tổng</th>\n      <th>{{ $json[\"Tổng\"] }}</th>\n    </tr>\n  </table>\n\n  <p style=\"margin-top: 20px;\">Trân trọng,<br>Hệ thống giám sát nội dung</p>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -100
+      ],
+      "id": "b73d183b-637d-42ba-a093-866a7533b692",
+      "name": "Gửi Email cảnh báo hằng tuần",
+      "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
+      "credentials": {
+        "smtp": {
+          "id": "dZ2DwwWFlZQCBBwj",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wFICpd2pBwjRnHlQiLgKjlBhr-N096HS4sDnvRKvokQ",
+          "mode": "list",
+          "cachedResultName": "Thong_Ke_Bao_cao_Tuan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wFICpd2pBwjRnHlQiLgKjlBhr-N096HS4sDnvRKvokQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wFICpd2pBwjRnHlQiLgKjlBhr-N096HS4sDnvRKvokQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TuNgay": "={{ $json['Từ ngày'] }}",
+            "DenNgay": "={{ $json['Đến ngày'] }}",
+            "SoLuongCao": "={{ $json.Cao }}",
+            "SoLuongTrungBinh": "={{ $json['Trung bình'] }}",
+            "SoLuongThap": "={{ $json['Thấp'] }}",
+            "TongSoLuong": "={{ $json['Tổng'] }}",
+            "BaoCaoID": "={{ $json.ID }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TuNgay",
+              "displayName": "TuNgay",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DenNgay",
+              "displayName": "DenNgay",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SoLuongCao",
+              "displayName": "SoLuongCao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SoLuongTrungBinh",
+              "displayName": "SoLuongTrungBinh",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SoLuongThap",
+              "displayName": "SoLuongThap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TongSoLuong",
+              "displayName": "TongSoLuong",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BaoCaoID",
+              "displayName": "BaoCaoID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        680,
+        -300
+      ],
+      "id": "a88007cc-61d0-46c8-892e-8749aaa5d45b",
+      "name": "Ghi kết quả báo cáo tuần",
+      "credentials": {
+        "googleApi": {
+          "id": "bDfKP49GQmA772n5",
+          "name": "API Sheets"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Tập lịch chạy": {
+      "main": [
+        [
+          {
+            "node": "Tạo danh sách URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tạo danh sách URL": {
+      "main": [
+        [
+          {
+            "node": "Gửi request tìm bài viết",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gửi request tìm bài viết": {
+      "main": [
+        [
+          {
+            "node": "Tách danh sách bài viết",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tách danh sách bài viết": {
+      "main": [
+        [
+          {
+            "node": "Lọc bài viết tiêu cực",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lọc bài viết tiêu cực": {
+      "main": [
+        [
+          {
+            "node": "Đọc file Sheets BaiViet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gộp bài viết mới với dữ liệu cũ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Đọc file Sheets BaiViet": {
+      "main": [
+        [
+          {
+            "node": "Gộp bài viết mới với dữ liệu cũ",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gộp bài viết mới với dữ liệu cũ": {
+      "main": [
+        [
+          {
+            "node": "Kiểm tra bai viết trùng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kiểm tra bai viết trùng": {
+      "main": [
+        [
+          {
+            "node": "Ghi bài viết vào  Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ghi bài viết vào  Sheets": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Xử lý kết quả AL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xử lý kết quả AL": {
+      "main": [
+        [
+          {
+            "node": "Kiểm tra bài viết rỗng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kiểm tra bài viết rỗng": {
+      "main": [
+        [
+          {
+            "node": "Ghi kết quả xử lý vào sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gửi Email cảnh báo hằng ngày",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tập lịch chạy mỗi tuần": {
+      "main": [
+        [
+          {
+            "node": "Đọc dữ liệu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Đọc dữ liệu": {
+      "main": [
+        [
+          {
+            "node": "Xử lý mức độ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xử lý mức độ": {
+      "main": [
+        [
+          {
+            "node": "Tổng hợp theo tuần",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tổng hợp theo tuần": {
+      "main": [
+        [
+          {
+            "node": "Gửi Email cảnh báo hằng tuần",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ghi kết quả báo cáo tuần",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "37124d54-2dc2-4f86-86a8-712d00186dfa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc11cb4891443fae026bd649ce2af9b7a75f9d81700ccc3935ac1d32053faa0e"
+  },
+  "id": "ft5fO1Akxebylv9S",
+  "tags": []
+}
