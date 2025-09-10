@@ -1,5 +1,5 @@
 {
-  "name": "DoAnThucTap",
+  "name": "DoAn_ThucTap",
   "nodes": [
     {
       "parameters": {
@@ -15,23 +15,23 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -360,
-        140
+        -1040,
+        440
       ],
-      "id": "18db2fdc-3943-4d35-9d0e-d98c2edb295f",
+      "id": "08f651c7-90f1-42e4-88a4-3acd0ed27ece",
       "name": "Tập lịch chạy"
     },
     {
       "parameters": {
-        "jsCode": "// API KEYS\nconst apiKey = \"AIzaSyAQQ_GV3xzsZH5Bhki2n-M1_2XvrkWOvKI\";\nconst cxID = \"97e47ea83d8d74ae5\";\n\n// Các nhóm từ khóa\nconst tuKhoaChinh = '\"Đại học Cửu Long\" OR \"MKU\" OR \"DHCL\"';\nconst tuKhoaTieuCuc = '\"lừa đảo\" OR \"gian lận\" OR \"chiếm đoạt\" OR \"thiếu minh bạch\" OR \"phốt\" OR \"từ ngữ đã kích\" OR \"mất uy tín\" OR \"chất lượng kém\"';\nconst tuKhoaLinhVuc = '\"tuyển sinh\" OR \"giảng viên\" OR \"giáo dục\" OR \"đào tạo\" OR \"sinh viên\" OR \"bằng cấp\"';\nconst site = 'site:vnexpress.net OR site:tuoitre.vn OR site:thanhnien.vn OR site:vietnamnet.vn';\n\n// Ghép query\nconst query = `(${tuKhoaChinh}) (${tuKhoaTieuCuc}) (${tuKhoaLinhVuc}) (${site})`;\n\n// Tạo URL (có encodeURIComponent)\nconst url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cxID}&num=10&q=${query}&sort=date&lr=lang_vi&gl=vn`;\n\n// Trả về kết quả\nreturn [{ json: { url } }];\n"
+        "jsCode": "// API KEYS\nconst apiKey = \"AIzaSyAQQ_GV3xzsZH5Bhki2n-M1_2XvrkWOvKI\";\nconst cxID = \"37a5edc77da3c4fc9\";\n\n// Các nhóm từ khóa\nconst tuKhoaChinh = '\"Đại học Cửu Long\" OR \"MKU\" OR \"DHCL\"';\nconst tuKhoaTieuCuc = '\"lừa đảo\" OR \"gian lận\" OR \"chiếm đoạt\" OR \"thiếu minh bạch\" OR \"phốt\" OR \"mất uy tín\" OR \"chất lượng kém\"';\nconst tuKhoaLinhVuc = '\"tuyển sinh\" OR \"giảng viên\" OR \"giáo dục\" OR \"đào tạo\" OR \"sinh viên\" OR \"bằng cấp\"';\n\n// Ghép query tìm kiếm\nconst query = `${tuKhoaChinh} (${tuKhoaTieuCuc}) (${tuKhoaLinhVuc})`;\n\n// URL API (lấy trong 1 tuần gần nhất, tiếng Việt, location VN)\nconst url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cxID}&num=10&q=${encodeURIComponent(query)}&dateRestrict=w1&lr=lang_vi&gl=vn`;\n\n// Trả về cho n8n (hoặc in ra console nếu test Node.js)\nreturn [{ json: { url } }];\n\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -140,
-        140
+        -820,
+        440
       ],
-      "id": "164c8f54-de25-443d-9219-e1376143f0d3",
+      "id": "ff164771-619a-4479-85c2-33259b2b48d5",
       "name": "Tạo danh sách URL"
     },
     {
@@ -42,10 +42,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        80,
-        140
+        -600,
+        440
       ],
-      "id": "48ba51a7-3c54-4bed-8696-d183793da6c3",
+      "id": "9d1e1521-2a53-4e45-8221-c58d7fefb94e",
       "name": "Gửi request tìm bài viết"
     },
     {
@@ -55,10 +55,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        300,
-        140
+        -380,
+        440
       ],
-      "id": "f4d89eb3-e742-44d3-9871-db13ac1735a1",
+      "id": "267427aa-784b-4f45-9b01-8a115863bebd",
       "name": "Tách danh sách bài viết"
     },
     {
@@ -68,10 +68,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -340,
-        360
+        -1020,
+        660
       ],
-      "id": "b6e02ec8-944d-48d5-a34b-f104d94cdf46",
+      "id": "439bc592-4fa4-4220-9c0d-a11c9da6956c",
       "name": "Lọc bài viết tiêu cực",
       "alwaysOutputData": true
     },
@@ -97,10 +97,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        -120,
-        460
+        -800,
+        760
       ],
-      "id": "d4e72ffc-fe90-4530-aa0b-4bc00150e076",
+      "id": "810656df-e5d8-4c99-a81d-5ed5a3407058",
       "name": "Đọc file Sheets BaiViet",
       "credentials": {
         "googleApi": {
@@ -114,10 +114,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
       "position": [
-        100,
-        380
+        -580,
+        680
       ],
-      "id": "518f64e5-e10c-40c0-adb9-a3b4f7cb6b85",
+      "id": "88709966-6e7f-4142-800b-ee992f998aa5",
       "name": "Gộp bài viết mới với dữ liệu cũ"
     },
     {
@@ -127,10 +127,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        300,
-        380
+        -380,
+        680
       ],
-      "id": "ea2e614a-d430-4c8a-8d64-29d02e2430fd",
+      "id": "10aae88a-09cc-41b2-8bea-6c352a05dc56",
       "name": "Kiểm tra bai viết trùng",
       "alwaysOutputData": true
     },
@@ -217,10 +217,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        -340,
-        680
+        -1020,
+        980
       ],
-      "id": "3c9471cb-ab41-46db-a88d-da67ae35dcd3",
+      "id": "1880f66a-1b7f-4d93-9971-dfee71b745d2",
       "name": "Ghi bài viết vào  Sheets",
       "credentials": {
         "googleApi": {
@@ -232,7 +232,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Báo cáo phát hiện bài viết tiêu cực\n\nThời gian phát hiện: {{ $json.NgayPhatHien }}\nLink bài viết: {{ $json.LinkBaiViet }}\nTiêu đề: {{ $json.TieuDe }}\nNội dung phản ánh:{{ $json.NoiDung }}\n\nTóm tắt vấn đề tiêu cực:\n[Ví dụ: chất lượng dịch vụ kém, sai phạm trong quản lý, thái độ nhân viên, sự cố an toàn…]\n\nHướng xử lý đề xuất\n\nXác minh thông tin: Liên hệ tác giả (nếu có) hoặc bộ phận liên quan để thu thập dữ liệu.\n\nCông khai phản hồi: Thông báo chính thức, ghi nhận phản ánh và cam kết khắc phục.\n\nGiải quyết nội bộ: Rà soát quy trình, đào tạo lại nhân sự, xử lý sự cố.\n\nTheo dõi phản ứng cộng đồng: Đánh giá mức độ lan truyền, điều chỉnh chiến lược truyền thông.\n\nNgăn chặn khủng hoảng: Chuẩn bị kịch bản ứng phó nếu lan truyền mạnh hoặc báo chí đưa tin.\n\nMức độ ảnh hưởng\n\nThấp: < 100 tương tác, ý kiến cá nhân, không liên quan trực tiếp, chưa lên báo chí.\n\nTrung bình: 100 – < 1.000 tương tác, có bằng chứng nhưng chưa nghiêm trọng, chia sẻ trong cộng đồng mục tiêu.\n\nCao: ≥ 1.000 tương tác hoặc xuất hiện trên báo chí lớn, liên quan pháp lý/an toàn, có bằng chứng mạnh.\n\nLưu ý\n\nNếu không liên quan trực tiếp đến Trường ĐH Cửu Long, xếp mức ảnh hưởng Thấp (trừ khi gây hiểu lầm thương hiệu).\n\nLuôn giữ trung lập, cần kiểm chứng thông tin thay vì kết luận vội.\n\nKhông quy chụp, tránh dùng cụm từ mang tính buộc tội.",
+        "text": "=Báo cáo phát hiện bài viết tiêu cực\n\nThời gian phát hiện: {{ $json.NgayPhatHien }}\nLink bài viết: {{ $json.LinkBaiViet }}\nTiêu đề: {{ $json.TieuDe }}\nNội dung phản ánh:{{ $json.NoiDung }}\n\nTóm tắt vấn đề tiêu cực:\n[Ví dụ: chất lượng dịch vụ kém, sai phạm trong quản lý, thái độ nhân viên, sự cố an toàn…]\n\nHướng xử lý đề xuất\n\nXác minh thông tin: Liên hệ tác giả (nếu có) hoặc bộ phận liên quan để thu thập dữ liệu.\n\nCông khai phản hồi: Thông báo chính thức, ghi nhận phản ánh và cam kết khắc phục.\n\nGiải quyết nội bộ: Rà soát quy trình, đào tạo lại nhân sự, xử lý sự cố.\n\nTheo dõi phản ứng cộng đồng: Đánh giá mức độ lan truyền, điều chỉnh chiến lược truyền thông.\n\nNgăn chặn khủng hoảng: Chuẩn bị kịch bản ứng phó nếu lan truyền mạnh hoặc báo chí đưa tin.\n\nMức độ ảnh hưởng\n\nThấp: < 100 tương tác, ý kiến cá nhân, không liên quan trực tiếp, chưa lên báo chí.\n\nTrung bình: 100 – < 1.000 tương tác, có bằng chứng nhưng chưa nghiêm trọng, chia sẻ trong cộng đồng mục tiêu.\n\nCao: ≥ 1.000 tương tác hoặc xuất hiện trên báo chí lớn, liên quan pháp lý/an toàn, có bằng chứng mạnh.\n\nLưu ý\n\nNếu không liên quan trực tiếp đến Trường ĐH Cửu Long, xếp mức ảnh hưởng Thấp (trừ khi gây hiểu lầm thương hiệu).\n\nLuôn giữ trung lập, cần kiểm chứng thông tin thay vì kết luận vội.\n\nKhông quy chụp, tránh dùng cụm từ mang tính buộc tội.\nNẾU KHÔNG CÓ BÀI VIẾT TRẢ VỀ OUPUT LÀ TRỐNG",
         "options": {
           "systemMessage": "=Bạn là một hệ thống giám sát và phân tích thông tin tiêu cực về một tổ chức/cá nhân. Nhiệm vụ của bạn là xử lý dữ liệu đầu vào, đánh giá mức độ ảnh hưởng, và đưa ra hướng xử lý chi tiết, dựa trên dữ liệu có sẵn.\n\nQuy tắc xử lý thông tin\n\nNếu bài viết tồn tại và có nội dung:\n\nTrích xuất các trường:\n\nTóm tắt: → mô tả ngắn gọn sự việc (1–2 câu). Nếu thông tin chưa đầy đủ → ghi \"Cần xác minh thêm về …\".\n\nHướng xử lý: → chi tiết từng bước xử lý thông tin tiêu cực.\n\nMức độ ảnh hưởng: → Thấp/Trung bình/Cao + lý do cụ thể.\n\nDự đoán nguồn bài viết: → nguồn xuất phát chính hoặc ghi \"Cần xác minh thêm\".\n\nHướng xử lý chi tiết khi phát hiện bài viết tiêu cực:\n\nXác minh thông tin với nguồn/bộ phận liên quan.\n\nLưu trữ dữ liệu gốc: link, ảnh, video.\n\nĐánh giá mức độ lan truyền: lượt chia sẻ, bình luận, độ phổ biến trên báo chí/mạng xã hội.\n\nChuẩn bị phản hồi nội bộ hoặc công khai nếu cần.\n\nTheo dõi sát tình hình trong 24–48 giờ.\n\nNẾU KHÔNG CÓ BÀI VIẾT TRẢ VỀ OUPUT LÀ TRỐNG\n\n"
         }
@@ -240,10 +240,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
       "position": [
-        -120,
-        680
+        -800,
+        980
       ],
-      "id": "3e8ac2c2-2723-44a3-ad11-0263abd5a078",
+      "id": "a2aac4b0-ce1a-4eed-af19-6eefebb9653d",
       "name": "AI Agent"
     },
     {
@@ -254,10 +254,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -100,
-        840
+        -780,
+        1140
       ],
-      "id": "15d7d870-c051-4318-959b-afd20eb04a0a",
+      "id": "b4536016-c1de-475b-a8df-792aa1735fd7",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
@@ -273,10 +273,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        240,
-        680
+        -440,
+        980
       ],
-      "id": "019b96fb-b1cc-44f2-9df3-584a66f62cc9",
+      "id": "a1d0bcb2-c40e-449c-a328-f2d824880f81",
       "name": "Xử lý kết quả AL",
       "alwaysOutputData": true
     },
@@ -301,12 +301,12 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "TieuDe": "={{ $json.tieuDe }}",
             "NoiDungTomTat": "={{ $json.noiDung }}",
             "HuongXuLy": "={{ $json.huongXuLy }}",
             "MucDoAnhHuong": "={{ $json.mucDoAnhHuong }}",
             "LinkBaiViet": "={{ $('Ghi bài viết vào  Sheets').item.json.LinkBaiViet }}",
-            "NgayPhatHien": "={{ $('Ghi bài viết vào  Sheets').item.json.NgayPhatHien }}"
+            "NgayPhatHien": "={{ $('Ghi bài viết vào  Sheets').item.json.NgayPhatHien }}",
+            "TieuDe": "={{ $json.tieuDe }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -382,10 +382,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        680,
-        580
+        0,
+        880
       ],
-      "id": "a86c21f3-8fb4-4c8f-9252-66c0c282a99f",
+      "id": "59c917ef-6b31-4504-b3ab-9f8d3f571872",
       "name": "Ghi kết quả xử lý vào sheets",
       "credentials": {
         "googleApi": {
@@ -432,10 +432,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        460,
-        680
+        -220,
+        980
       ],
-      "id": "7d564adb-bd18-43b5-ac46-04929f146059",
+      "id": "ebf8b964-615e-42cb-8537-2444a76c76ac",
       "name": "Kiểm tra bài viết rỗng"
     },
     {
@@ -444,16 +444,16 @@
         "toEmail": "haulailaptrinh@gmail.com",
         "subject": "Báo cáo giám sát hàng ngày - ĐH Cửu Long",
         "emailFormat": "html",
-        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      background-color: #f1f1f1;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 20px;\n      max-width: 700px;\n      margin: auto;\n      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    }\n    h2 {\n      color: #b00020;\n      font-size: 20px;\n    }\n    .section {\n      margin-bottom: 16px;\n    }\n    .label {\n      font-weight: bold;\n      color: #555;\n    }\n    .value {\n      margin-top: 4px;\n      white-space: pre-line;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2> {{ $json.tieuDe}}</h2>\n\n    <div class=\"section\">\n      <div class=\"label\"> Ngày phát hiện:{{ $('Ghi bài viết vào  Sheets').item.json.NgayPhatHien }}</div>\n      <div class=\"value\"></div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">Tóm tắt nội dung:</div>\n      <div class=\"value\">{{ $json.noiDung }}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">Hướng xử lý:</div>\n      <div class=\"value\">{{ $json.huongXuLy }}</div>\n    </div>\n\n    {{ $json.mucDoAnhHuong ? `\n    <div class=\"section\">\n      <div class=\"label\"> Mức độ ảnh hưởng:</div>\n      <div class=\"value\">${$json.mucDoAnhHuong}</div>\n    </div>` : '' }}\n\n\n   {{$('Ghi bài viết vào  Sheets').item.json.LinkBaiViet ? `\n    <div class=\"section\">\n      <div class=\"label\"> Link bài viết:</div>\n      <div class=\"value\"></div>\n    </div>` : '' }}\n{{ $('Ghi bài viết vào  Sheets').item.json.LinkBaiViet }}\n\n  </div>\n</body>\n</html>\n",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      background-color: #f1f1f1;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 20px;\n      max-width: 700px;\n      margin: auto;\n      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    }\n    h2 {\n      color: #b00020;\n      font-size: 20px;\n    }\n    .section {\n      margin-bottom: 16px;\n    }\n    .label {\n      font-weight: bold;\n      color: #555;\n    }\n    .value {\n      margin-top: 4px;\n      white-space: pre-line;\n    }\n    a {\n      color: #1a73e8;\n      text-decoration: none;\n    }\n    a:hover {\n      text-decoration: underline;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2>{{ $('Ghi bài viết vào  Sheets').item.json.TieuDe }}</h2>\n\n    <div class=\"section\">\n      <div class=\"label\"> Ngày phát hiện:{{ $('Ghi bài viết vào  Sheets').item.json.NgayPhatHien }}</div>\n      <div class=\"value\"></div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">Tóm tắt nội dung:</div>\n      <div class=\"value\">{{ $('Ghi bài viết vào  Sheets').item.json.NoiDung }}</div>\n    </div>\n\n    <div class=\"section\">\n      <div class=\"label\">Hướng xử lý:</div>\n      <div class=\"value\">{{ $json.huongXuLy }}</div>\n    </div>\n\n    {{ $json.mucDoAnhHuong ? `\n    <div class=\"section\">\n      <div class=\"label\"> Mức độ ảnh hưởng:</div>\n      <div class=\"value\">${$json.mucDoAnhHuong}</div>\n    </div>` : '' }}\n\n\n   {{$('Ghi bài viết vào  Sheets').item.json.LinkBaiViet ? `\n    <div class=\"section\">\n      <div class=\"label\"> Link bài viết:</div>\n      <div class=\"value\"></div>\n    </div>` : '' }}\n{{ $('Ghi bài viết vào  Sheets').item.json.LinkBaiViet }}\n\n  </div>\n</body>\n</html>\n",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        680,
-        760
+        0,
+        1060
       ],
-      "id": "bf6a20cb-9155-44a9-8450-a73bc7ee2760",
+      "id": "8573bbd8-7a05-4c50-aba7-1c5ecda35711",
       "name": "Gửi Email cảnh báo hằng ngày",
       "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
       "credentials": {
@@ -476,11 +476,11 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
       "position": [
-        -340,
-        -200
+        -1020,
+        100
       ],
       "name": "Tập lịch chạy mỗi tuần",
-      "id": "f59bef16-d963-4bff-9ae8-db2ae96bb004"
+      "id": "d747c80f-4e2f-4ffe-8406-86ced57cab00"
     },
     {
       "parameters": {
@@ -504,10 +504,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        -100,
-        -200
+        -780,
+        100
       ],
-      "id": "c8480d99-df3a-4552-8f63-ac57cdd00c0a",
+      "id": "b9a23ac3-da24-41a3-be5c-577126b47784",
       "name": "Đọc dữ liệu",
       "credentials": {
         "googleApi": {
@@ -523,10 +523,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        120,
-        -200
+        -560,
+        100
       ],
-      "id": "1c2efa6b-1008-4440-a7d3-25788e09a8f0",
+      "id": "8b2db289-1800-4ac3-886f-fa3fe2300d1c",
       "name": "Xử lý mức độ"
     },
     {
@@ -536,10 +536,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        320,
-        -200
+        -360,
+        100
       ],
-      "id": "dc6a8d86-bcbe-4203-b00a-442c6abb82e8",
+      "id": "cadd9deb-d519-4525-b642-f2d42f419fe0",
       "name": "Tổng hợp theo tuần"
     },
     {
@@ -554,10 +554,10 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
-        660,
-        -100
+        -20,
+        200
       ],
-      "id": "b73d183b-637d-42ba-a093-866a7533b692",
+      "id": "21606a55-86a7-4d88-8042-4bdf36380d0e",
       "name": "Gửi Email cảnh báo hằng tuần",
       "webhookId": "0e4746a8-0953-4816-b515-ddde7f605e25",
       "credentials": {
@@ -670,10 +670,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        680,
-        -300
+        0,
+        0
       ],
-      "id": "a88007cc-61d0-46c8-892e-8749aaa5d45b",
+      "id": "1eb302ac-8519-4d96-ad40-05dab11eb7ee",
       "name": "Ghi kết quả báo cáo tuần",
       "credentials": {
         "googleApi": {
@@ -789,23 +789,23 @@
         ]
       ]
     },
-    "Google Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "AI Agent": {
       "main": [
         [
           {
             "node": "Xử lý kết quả AL",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -892,11 +892,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "37124d54-2dc2-4f86-86a8-712d00186dfa",
+  "versionId": "c319c66d-5a55-4433-935b-4c1bda9e6db1",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "dc11cb4891443fae026bd649ce2af9b7a75f9d81700ccc3935ac1d32053faa0e"
   },
-  "id": "ft5fO1Akxebylv9S",
+  "id": "xDnbfDSOuMYwapYf",
   "tags": []
 }
